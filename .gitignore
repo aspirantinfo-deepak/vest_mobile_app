@@ -1,0 +1,63 @@
+# Dependencies
+/node_modules/
+.pnp.cjs
+.pnp.loader.mjs
+
+# Vite build output
+/dist/
+/!.well-known
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Editor and OS files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+__MACOSX
+*.swp
+*.swo
+*.swn
+*.bak
+*.tmp
+*.temp
+
+# Capacitor files
+android/
+ios/
+# Capacitor build artifacts
+*.apk
+*.aab
+*.ipa
+
+# Optional npm cache directory
+.npm/
+
+# Misc
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env
+
+# TailwindCSS build artifacts
+*.css.map
+
+# Testing files
+coverage/
+jest.config.js
+jest.setup.js
+*.test.*
+__tests__/
+__mocks__/
+
+# TypeScript
+*.tsbuildinfo
+
+# ESLint
+.eslintcache
