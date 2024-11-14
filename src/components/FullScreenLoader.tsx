@@ -9,17 +9,18 @@ interface FullScreenLoaderProps {
 }
 
 const FullScreenLoader: React.FC<FullScreenLoaderProps> = ({ isLoading }) => {
-  if (!isLoading) return null;
+  return null
+  // if (!isLoading) return null;
 
-  return (
-    <div className="loader-container">
-      <div>
-        <div className="loader"></div>
-        {/* <img src={roc} className="roc_img"></img> */}
-      </div>
-      {/* <p className="loader-message">{message}</p> */}
-    </div>
-  );
+  // return (
+  //   <div className="loader-container">
+  //     <div>
+  //       <div className="loader"></div>
+  //       {/* <img src={roc} className="roc_img"></img> */}
+  //     </div>
+  //     {/* <p className="loader-message">{message}</p> */}
+  //   </div>
+  // );
 };
 
 export default FullScreenLoader;
