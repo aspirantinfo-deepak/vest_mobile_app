@@ -6,6 +6,7 @@ import { getRequest } from "../services/axiosService";
 import { Sheet } from "react-modal-sheet";
 // import MarketSearch from "../components/MarketSearch";
 import FullScreenLoader from "../components/FullScreenLoader";
+import MarketSearch from "../components/MarketSearch";
 
 const Markets = () => {
   const [listView, setlistView] = useState(true);
@@ -234,7 +235,7 @@ const Markets = () => {
 
         <div className="row mt-4 pt-2">
           <div className="col-12">
-            <button className="add_assets_btn">Add asset +</button>
+            <button className="add_assets_btn" onClick={() => setOpen(true)}>Add stock +</button>
           </div>
         </div>
       </div>
@@ -1170,7 +1171,7 @@ const Markets = () => {
           <Sheet.Header style={{ background: "#000" }} />
           <Sheet.Content style={{ background: "#000" }}>
             <Sheet.Scroller draggableAt="both">
-              {/* <MarketSearch stockData={stockData} /> */}
+              <MarketSearch />
             </Sheet.Scroller>
           </Sheet.Content>
         </Sheet.Container>

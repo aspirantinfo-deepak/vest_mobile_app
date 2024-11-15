@@ -218,14 +218,17 @@ const News = () => {
 
         <div className="row mt-4 pt-2">
           <div className="col-12">
-            <button className="add_assets_btn">Add topic +</button>
+            <button className="add_assets_btn" onClick={() => setisOpen(true)}>Add topic +</button>
           </div>
         </div>
       </div>
 
       <Sheet
         isOpen={isOpen}
-        onClose={() => setisOpen(false)}
+        onClose={() => {
+          setisOpen(false)
+          setnewsDetails('')
+        }}
         // snapPoints={[1, 0.5, 0.25]}
         initialSnap={0}
         // detent="full-height"
@@ -234,7 +237,7 @@ const News = () => {
           <Sheet.Header style={{ background: "#000" }} />
           <Sheet.Content style={{ background: "#000" }}>
             <Sheet.Scroller draggableAt="both">
-              {newsDetails && <NewsSearch newsDetails={newsDetails} />}
+              {<NewsSearch newsDetails={newsDetails} />}
             </Sheet.Scroller>
           </Sheet.Content>
         </Sheet.Container>

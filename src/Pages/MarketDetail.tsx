@@ -69,12 +69,12 @@ const MarketDetail = () => {
 
       setReturnData(returns);
     }
-  }, [currentPrice, userTickerPosition]);
+  }, [currentPrice, userTickerPosition, isStockDetails]);
   useEffect(() => {
     fetchUserPortfolio(setUserPortfolio);
 
     //eslint-disable-next-line
-  }, []);
+  }, [isStockDetails]);
   useEffect(() => {
     const currentTicker = JSON.parse(localStorage.getItem("currentTicker")!);
     if (currentTicker) {
@@ -93,7 +93,7 @@ const MarketDetail = () => {
         )
       );
     }
-  }, [userPortfolio, ticker]);
+  }, [userPortfolio, ticker, isStockDetails]);
   // const getStockDetails = async (item: any) => {
   //   setisStockDetails(2);
 
@@ -103,7 +103,7 @@ const MarketDetail = () => {
     if (ticker && interval) {
       getStockGraph();
     }
-  }, [ticker, interval]);
+  }, [ticker, interval, isStockDetails]);
   useEffect(() => {
     if (ticker) {
       getStockData();
@@ -113,7 +113,7 @@ const MarketDetail = () => {
       getPEStockData();
       regenerate();
     }
-  }, [ticker]);
+  }, [ticker, isStockDetails]);
   const getStockAdditional = async () => {
     try {
       setIsLoading(true);
@@ -489,7 +489,7 @@ const MarketDetail = () => {
               <div className="col-12 mt-1">
                 <h3 className="heading mb-0">{stockDetail?.name}</h3>
                 <h3
-                  className="heading mb-0 py-1 headspanss"
+                  className="heading mb-0 py-1"
                   style={{ display: "flex", alignItems: "center" }}
                 >
                   {currentPrice && (
@@ -511,7 +511,7 @@ const MarketDetail = () => {
                   {calculatePercentageChange(currentPrice, previousPrice)}
                   %)&nbsp;
                   <span>
-                    {interval == "live" && "live"}{" "}
+                    {interval == "live" && "today"}{" "}
                     {interval == "1h" && "past hour"}{" "}
                     {interval == "1d" && "past day"}{" "}
                     {interval == "1w" && "past week"}{" "}
@@ -629,70 +629,72 @@ const MarketDetail = () => {
               </div>
             </div>
 
-            <div className="row  mt-4">
-              <div className="col-12 pt-2">
-                <h3 className="subheading m-0">Your position</h3>
+            {userTickerPosition?.quantity && <>
+              <div className="row  mt-4">
+                <div className="col-12 pt-2">
+                  <h3 className="subheading m-0">Your position</h3>
+                </div>
               </div>
-            </div>
 
-            <div className="row mt-3">
-              <div className="col-4 mb-3">
-                <p className="para5">Shares</p>
-                <p className="para6">
-                  {userTickerPosition?.quantity &&
-                    formatCurrency3(userTickerPosition?.quantity)}
-                  {!userTickerPosition?.quantity && "--"}
-                </p>
-              </div>
-              <div className="col-4 mb-3">
-                <p className="para5">Market value</p>
-                <p className="para6">
-                  {userTickerPosition?.quantity &&
-                    formatCurrency2(
-                      userTickerPosition?.quantity * currentPrice
+              <div className="row mt-3">
+                <div className="col-4 mb-3">
+                  <p className="para5">Shares</p>
+                  <p className="para6">
+                    {userTickerPosition?.quantity &&
+                      formatCurrency3(userTickerPosition?.quantity)}
+                    {!userTickerPosition?.quantity && "--"}
+                  </p>
+                </div>
+                <div className="col-4 mb-3">
+                  <p className="para5">Market value</p>
+                  <p className="para6">
+                    {userTickerPosition?.quantity &&
+                      formatCurrency2(
+                        userTickerPosition?.quantity * currentPrice
+                      )}
+                    {!userTickerPosition?.quantity && "--"}
+                  </p>
+                </div>
+                <div className="col-4 mb-3">
+                  <p className="para5">Average cost</p>
+                  <p className="para6">
+                    {" "}
+                    {userTickerPosition?.avgBuyPrice &&
+                      formatCurrency2(userTickerPosition?.avgBuyPrice)}
+                    {!userTickerPosition?.avgBuyPrice && "--"}
+                  </p>
+                </div>
+                <div className="col-4 mb-3">
+                  <p className="para5">ROI $</p>
+                  <p className="para6">
+                    {returnData ? (
+                      <>
+                        {returnData?.realizedDollar >= 0 ? "+" : ""}$
+                        {fc(returnData.realizedDollar)}
+                      </>
+                    ) : (
+                      "--"
                     )}
-                  {!userTickerPosition?.quantity && "--"}
-                </p>
+                  </p>
+                </div>
+                <div className="col-4 mb-3">
+                  <p className="para5">ROI %</p>
+                  <p
+                    className={
+                      returnData?.realizedDollar >= 0
+                        ? "para6 clr_grn"
+                        : "para6 clr_red"
+                    }
+                  >
+                    {returnData ? (
+                      <> {fc(returnData.realizedPercentage)}%</>
+                    ) : (
+                      "--"
+                    )}
+                  </p>
+                </div>
               </div>
-              <div className="col-4 mb-3">
-                <p className="para5">Average cost</p>
-                <p className="para6">
-                  {" "}
-                  {userTickerPosition?.avgBuyPrice &&
-                    formatCurrency2(userTickerPosition?.avgBuyPrice)}
-                  {!userTickerPosition?.avgBuyPrice && "--"}
-                </p>
-              </div>
-              <div className="col-4 mb-3">
-                <p className="para5">ROI $</p>
-                <p className="para6">
-                  {returnData ? (
-                    <>
-                      {returnData?.realizedDollar >= 0 ? "+" : ""}$
-                      {fc(returnData.realizedDollar)}
-                    </>
-                  ) : (
-                    "--"
-                  )}
-                </p>
-              </div>
-              <div className="col-4 mb-3">
-                <p className="para5">ROI %</p>
-                <p
-                  className={
-                    returnData?.realizedDollar >= 0
-                      ? "para6 clr_grn"
-                      : "para6 clr_red"
-                  }
-                >
-                  {returnData ? (
-                    <> {fc(returnData.realizedPercentage)}%</>
-                  ) : (
-                    "--"
-                  )}
-                </p>
-              </div>
-            </div>
+            </> }
 
             <div className="row  mt-4">
               <div className="col-12">
@@ -814,7 +816,7 @@ const MarketDetail = () => {
               </div>
             </div>
 
-            <div className="row mt-3">
+            <div className="row mt-5">
               <div className="col-12">
                 <p className="parane7 ">
                   News about {stockDetail?.name} ({ticker})
@@ -840,7 +842,7 @@ const MarketDetail = () => {
                 ))}
               </div>
             </div>
-            <div className="row mt-3">
+            <div className="row mt-5">
               <div className="col-12 pt-2">
                 <h3 className="subheading m-0">Recent updates:</h3>
                 <p
@@ -958,8 +960,13 @@ const MarketDetail = () => {
                 </p>
               </div>
             </div>
+            {IsBut && <div className="row">
+              <div className="col-12 mt-5 balance-show">
+                {formatCurrency2(cashBalance) + " avalaible to buy"}
+              </div>
+            </div>}
             <div className="row">
-              <div className="col-12 px-3 mt-5 mb-5">
+              <div className={"col-12 px-3 mb-5 " + (IsBut ? "mt-2" : "mt-5")}>
                 {!isConfirm && (
                   <button
                     onClick={() => {

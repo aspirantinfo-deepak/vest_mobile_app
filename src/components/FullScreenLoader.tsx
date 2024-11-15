@@ -9,6 +9,7 @@ interface FullScreenLoaderProps {
 }
 
 const FullScreenLoader: React.FC<FullScreenLoaderProps> = ({ isLoading }) => {
+  console.debug(isLoading)
   return null
   // if (!isLoading) return null;
 
