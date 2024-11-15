@@ -44,7 +44,8 @@ const StockGraph: React.FC<LineChartProps> = ({ data, currentPrice }) => {
 
     tooltip: {
       shared: true,
-      backgroundColor: "#333333", // Change tooltip background color here
+      // backgroundColor: "#333333", // Change tooltip background color here
+      backgroundColor: "transparent", // Change tooltip background color here
       style: {
         color: "#ffffff", // Change text color in the tooltip
       },

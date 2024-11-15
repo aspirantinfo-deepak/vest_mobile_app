@@ -504,8 +504,8 @@ const MarketSearch = (props: any) => {
       <FullScreenLoader isLoading={isLoading} message="Please wait..." />
       {isStockDetails == 1 && (
         <div>
-          <div className="row">
-            <div className="col-12 border-bottom1   px-3 pb-3 position-relative">
+          <div className="row border-bottom1 pt-3 pb-3 mt-2">
+            <div className="col-12 position-relative">
               <input
                 type="text"
                 onChange={(e) => setkeyword(e.target.value)}
@@ -515,7 +515,7 @@ const MarketSearch = (props: any) => {
                 className="popup_search"
                 placeholder="Search markets"
               ></input>
-              <button className="btn_save_news" onClick={() => searchStock()}>
+              {/* <button className="btn_save_news" onClick={() => searchStock()}>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
@@ -531,10 +531,10 @@ const MarketSearch = (props: any) => {
                   <line x1="5" y1="12" x2="19" y2="12"></line>
                   <polyline points="12 5 19 12 12 19"></polyline>
                 </svg>
-              </button>
+              </button> */}
             </div>
           </div>
-          <div className="row">
+          <div className="row pt4">
             <div className="col-12 mt-2 popup_buttons px-3">
               <button
                 className={type == "stock" ? "active" : ""}
@@ -547,6 +547,20 @@ const MarketSearch = (props: any) => {
                 onClick={() => settype("indexes")}
               >
                 Indexes
+              </button>
+            </div>
+
+          </div>
+          <div className="row pt-4">
+            <div className="col-12">
+              <button
+                className="refreshnwsfed"
+                style={
+                  keyword ? { backgroundColor: "#00FF00", color: "black" } : {}
+                }
+                onClick={searchStock}
+              >
+                Search
               </button>
             </div>
           </div>

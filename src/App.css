@@ -93,7 +93,7 @@ body {
   margin: 2px 0;
   color: #fff;
   font-size: 16px;
-  font-family: SF-Pro-Display-Medium;
+  font-family: SF-Pro-Display-Regular;
 }
 
 .company_name2 {
@@ -113,7 +113,7 @@ body {
   color: rgba(255, 255, 255, 0.5);
   font-size: 16px;
   margin: 0;
-  font-family: SF-Pro-Display-Medium;
+  font-family: SF-Pro-Display-Regular;
 }
 .uptrend {
   margin: 0;
@@ -122,7 +122,7 @@ body {
   align-items: center;
   justify-content: end;
   font-size: 16px;
-  font-family: SF-Pro-Display-Medium;
+  font-family: SF-Pro-Display-Regular;
 }
 
 .downtrend {
@@ -131,8 +131,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: end;
-  font-size: 17px;
-  font-family: SF-Pro-Display-Medium;
+  font-size: 16px;
+  font-family: SF-Pro-Display-Regular;
 }
 .border-bottom {
   border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
@@ -208,18 +208,18 @@ footer {
 }
 .trends2 {
   color: #b50c0c;
-  font-size: 14px;
+  font-size: 12px;
   margin: 2px 0;
   font-family: SF-Pro-Display-Bold;
 }
 .trends2 span {
   color: #fff;
   font-family: SF-Pro-Display-Medium !important;
-  text-transform: capitalize !important;
+  /* text-transform: capitalize !important; */
 
 }
 .trends {
-  font-size: 14px;
+  font-size: 12px;
   color: #00ff00;
   margin: 2px 0;
   font-family: SF-Pro-Display-Bold;
@@ -227,7 +227,7 @@ footer {
 .trends span {
   color: #fff;
   font-family: SF-Pro-Display-Medium !important;
-  text-transform: capitalize !important;
+  /* text-transform: capitalize !important; */
 }
 .positions {
   font-size: 12px;
@@ -1189,6 +1189,19 @@ footer {
 .highcharts-axis {
   display: none !important;
 }
+
+.highcharts-root {
+  .highcharts-plot-line {
+    display: none;
+  }
+}
+
+.highcharts-root:hover {
+  .highcharts-plot-line {
+    display: block;
+  }
+}
+
 .modal_picks {
   z-index: 999 !important;
   background-color: rgba(0, 0, 0, 0.9) !important;
@@ -1234,15 +1247,15 @@ footer {
   align-items: center !important;
 }
 .downtrend svg {
-  height: 18px !important;
-  width: 18px !important;
+  height: 17px !important;
+  width: 17px !important;
   margin-right: 5px !important;
   transform: rotate(-180deg);
 }
 
 .uptrend svg {
-  height: 18px !important;
-  width: 18px !important;
+  height: 17px !important;
+  width: 17px !important;
   margin-right: 5px !important;
 }
 
@@ -1408,6 +1421,13 @@ input {
   width: 25px;
   display: block;
   margin: auto;
+}
+
+.balance-show {
+  font-size: 15px;
+    color: rgba(255, 255, 255, 0.5);
+    font-family: SF-Pro-Display-Medium;
+    text-align: center;
 }
 
 /* .bg_gyreeys{
