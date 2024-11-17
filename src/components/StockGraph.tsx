@@ -6,9 +6,30 @@ import HighchartsReact from "highcharts-react-official";
 interface LineChartProps {
   data: [];
   currentPrice: any;
+  setcurrentPrice: any;
+  previousPrice: any
 }
-const StockGraph: React.FC<LineChartProps> = ({ data, currentPrice }) => {
+const StockGraph: React.FC<LineChartProps> = ({ data, setcurrentPrice, currentPrice, previousPrice }) => {
   const chartOptions = {
+    plotOptions: {
+      series: {
+        point : {
+          events: {
+            mouseOut : (e: any) => {
+              e.target.series.chart.xAxis[0].removePlotLine();
+              previousPrice && e.target.series.chart.yAxis[0].addPlotLine({
+                value: previousPrice,
+                color: "gray",
+                dashStyle: "Dot",
+                width: 1,
+                zIndex: 5,
+              })
+              setcurrentPrice(currentPrice)
+            }
+          }
+        }
+      }
+    },
     chart: {
       type: "line",
       backgroundColor: "transparent",
@@ -24,7 +45,20 @@ const StockGraph: React.FC<LineChartProps> = ({ data, currentPrice }) => {
       },
     },
     yAxis: {
-      visible: false, // Hides the y-axis
+      plotLines: [
+        {
+          value: previousPrice,
+          color: "gray",
+          dashStyle: "Dot",
+          width: 1,
+          zIndex: 5,
+        }
+      ],
+      visible: true, // Hides the y-axis
+      labels: {
+        enabled: false, // This hides only the y-axis labels
+      },
+      gridLineWidth: 0
     },
     legend: {
       enabled: false, // Hides the legend
@@ -44,13 +78,11 @@ const StockGraph: React.FC<LineChartProps> = ({ data, currentPrice }) => {
 
     tooltip: {
       shared: true,
-      // backgroundColor: "#333333", // Change tooltip background color here
-      backgroundColor: "transparent", // Change tooltip background color here
+      backgroundColor: "transparent",
       style: {
         color: "#ffffff", // Change text color in the tooltip
       },
-      positioner: (labelWidth: any, labelHeight: any, point: any) => {
-        console.log(labelWidth, labelHeight);
+      positioner: (_: any, __: any, point: any) => {
         var tooltipX = point.plotX - 60;
         var tooltipY = 0;
         return {
@@ -59,16 +91,11 @@ const StockGraph: React.FC<LineChartProps> = ({ data, currentPrice }) => {
         };
       },
       formatter: function (
-        this: Highcharts.TooltipFormatterContextObject
+        this: any
       ): any {
-        const currentPrice1 = this.y; // Access y-value
-        currentPrice(currentPrice1);
+        setcurrentPrice(this.y);
         const xValue = this.x;
-
-        // Remove the old plot line if it exists
-        // if (plotLineId) {
-        //   this.points![0].series.chart.xAxis[0].removePlotLine(plotLineId);
-        // }
+        const tValue = this.t;
         this.points![0].series.chart.xAxis[0].addPlotLine({
           value: Number(xValue), // Convert xValue to a number
           color: "gray",
@@ -76,7 +103,8 @@ const StockGraph: React.FC<LineChartProps> = ({ data, currentPrice }) => {
           width: 1,
           zIndex: 5,
         });
-        return `${dayjs(xValue).format("MMM DD, YYYY h:mm A")}`;
+        this.points![0].series.chart.yAxis[0].removePlotLine();
+        return `${dayjs(tValue).format("MMM DD, YYYY h:mm A")}`;
       },
     },
   };

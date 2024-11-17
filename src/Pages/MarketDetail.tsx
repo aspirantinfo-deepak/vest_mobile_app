@@ -198,33 +198,69 @@ const MarketDetail = () => {
   };
   const getStockGraph = async () => {
     try {
+      const timeValues: {[key : string]: any} = {
+        "live": {
+          from : (date: Date) => date.setTime(date.getTime() - 1000 * 60 * 5) && date,
+          multiplier: 1,
+          timespan: "second"
+        },
+        "1h": {
+          from : (date: Date) => date.setTime(date.getTime() - 1000 * 60 * 60) && date,
+          multiplier: 14,
+          timespan: "second"
+        },
+        "1d": {
+          from : (date: Date) => date.setDate(date.getDate() - 1) && date,
+          multiplier: 1,
+          timespan: "minute"
+        },
+        "1w": {
+          from : (date: Date) => date.setDate(date.getDate() - 7) && date,
+          multiplier: 15,
+          timespan: "minute"
+        },
+        "3m": {
+          from : (date: Date) => date.setMonth(date.getMonth() - 3) && date,
+          multiplier: 1,
+          timespan: "day"
+        },
+        "1y": {
+          from : (date: Date) => date.setFullYear(date.getFullYear() - 1) && date,
+          multiplier: 1,
+          timespan: "day"
+        },
+        "all": {
+          from : () => new Date('August 01, 2003'),
+          multiplier: 1,
+          timespan: "week"
+        },
+      }
+      const currentDate = new Date();
+      const oldDate = timeValues[interval].from(new Date(currentDate));
+      
       // setIsLoading(true);
-      const response = await postRequest<any>("/api/app/market/graph-data", {
-        ticker: ticker,
-        interval: interval,
-        type: "stock",
-      });
+      const url = "/api/polygon/stock/datapoints?" +
+                  "ticker=" + ticker + "&" +
+                  "fromDateUnixMs=" + oldDate.getTime() + "&" +
+                  "toDateUnixMs=" + currentDate.getTime() + "&" +
+                  "multiplier=" + timeValues[interval].multiplier + "&" +
+                  "timespan=" + timeValues[interval].timespan;
+      const response = await getRequest<any>(url);
       setIsLoading(false);
       setsampleData([]);
       if (response.status == 200) {
         var demosampleData = [];
         // var demoCategories = [];
-        // console.log(response.data.data.result);
-        for (var i = 0; i < response.data.data.result.length; i++) {
+        // console.log(response.data);
+        for (var i = 0; i < response.data.length; i++) {
           demosampleData.push({
-            y: response.data.data.result[i].price,
-            x: Date.parse(response.data.data.result[i].timestamp),
+            y: response.data[i].c,
+            x: i,
+            t: response.data[i].t
           });
         }
         setsampleData(demosampleData);
-        setpreviousPrice(response.data.data.result[0].price);
-        setcurrentPrice("");
-        setTimeout(() => {
-          setcurrentPrice(
-            response.data.data.result[response.data.data.result.length - 1]
-              .price
-          );
-        }, 10);
+        setpreviousPrice(response.data?.[0]?.c || previousPrice);
       }
     } catch (error: any) {
       setIsLoading(false);
@@ -232,7 +268,9 @@ const MarketDetail = () => {
     }
   };
   const formatCurrency = (num: any) => {
-    if (Math.abs(num) >= 1_000_000_000) {
+    if (Math.abs(num) >= 1_000_000_000_000) {
+      return `$${(num / 1_000_000_000_000).toFixed(1)}T`; // Trillion
+    } else if (Math.abs(num) >= 1_000_000_000) {
       return `$${(num / 1_000_000_000).toFixed(1)}B`; // Billion
     } else if (Math.abs(num) >= 1_000_000) {
       return `$${(num / 1_000_000).toFixed(1)}M`; // Million
@@ -322,7 +360,10 @@ const MarketDetail = () => {
       return 0;
     }
     const change = ((currentPrice1 - previousPrice1) / previousPrice1) * 100;
-    return change.toFixed(2);
+    return change.toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
   };
 
   const getActiveWatchList = async () => {
@@ -524,11 +565,13 @@ const MarketDetail = () => {
             </div>
 
             <div className="row">
-              <div className="col-12 border_btm_dotted" style={{ padding: 0 }}>
+              <div className="col-12" style={{ padding: 0 }}>
                 {sampleData.length > 0 && (
                   <StockGraph
                     data={sampleData}
-                    currentPrice={setcurrentPrice}
+                    currentPrice={currentPrice2}
+                    setcurrentPrice={setcurrentPrice}
+                    previousPrice={previousPrice}
                   />
                 )}
               </div>
@@ -796,7 +839,7 @@ const MarketDetail = () => {
               <div className="col-4 mb-3">
                 <p className="para5">Div/Yield</p>
                 <p className="para6">
-                  {formatCurrency3(stockDetail?.dividend) || "--"}
+                  {(((stockDetail?.dividend || 0) * 100 / currentPrice2)?.toFixed(2) + "%") || "--"}
                 </p>
               </div>
               <div className="col-4 mb-3">

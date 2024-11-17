@@ -43,6 +43,7 @@ interface Stats {
 }
 const Portfolio = () => {
   const [currentPrice, setcurrentPrice] = useState<any>("");
+  const [currentPrice2, setcurrentPrice2] = useState<any>("");
   const [previousPrice, setpreviousPrice] = useState<any>("");
   const [sampleData, setsampleData] = useState<any>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -60,12 +61,10 @@ const Portfolio = () => {
   const [tickerCompanyMap, setTickerCompanyMap] = useState<any>({});
   const [CompanyDetailsFetched, setCompanyDetailsFetched] = useState<any>("");
   const [CompanyStates, setCompanyStates] = useState(false);
-  const [assetsValue, setAssetsValue] = useState(null);
   const [quantityMap, setQuantityMap] = useState(null);
   const [amount, setamount] = useState<any>("");
   const [IsAmount, setIsAmount] = useState(false);
   const [isOpen, setOpen] = useState(false);
-  const [stockData, setstockData] = useState<any>("");
   const [portfolioStartDate, setportfolioStartDate] = useState<any>("");
   useEffect(() => {
     if (!mainPortfolio || !mainPortfolio.assets) {
@@ -162,7 +161,10 @@ const Portfolio = () => {
       0
     );
 
-    setAssetsValue(assetsValueTemp);
+    setcurrentPrice2(assetsValueTemp + cashBalance);
+    setTimeout(() => {
+      setcurrentPrice(assetsValueTemp + cashBalance);
+    }, 10);
   }, [livePriceMap, quantityMap]);
 
   const getTradeHistory = async () => {
@@ -221,10 +223,6 @@ const Portfolio = () => {
         });
         // demoCategories.push(response.data[i].time);
       }
-      setcurrentPrice("");
-      setTimeout(() => {
-        setcurrentPrice(response.data[response.data.length - 1].portfolioValue);
-      }, 10);
       setpreviousPrice(response.data[0].portfolioValue);
       setsampleData(demosampleData);
       // setcategories(demoCategories);
@@ -456,13 +454,13 @@ const Portfolio = () => {
     }
     return (
       <>
-        {keysToUse.map((ticker: any) => (
+        {keysToUse.map((ticker: any, i: number) => (
           <>
             <div
-              className="row py-3 border-bottom1 stock_names_prrice"
+              className={"row py-3 stock_names_prrice" + (i === keysToUse.length - 1 ? "" : " border-bottom1")}
               onClick={() => {
-                setstockData({ ticker: ticker });
-                setOpen(true);
+                localStorage.setItem("currentTicker", JSON.stringify({ticker : ticker}));
+                navigate("/marketdetail");
               }}
             >
               <div className="col-7">
@@ -517,10 +515,7 @@ const Portfolio = () => {
                       <polyline points="5 12 12 5 19 12"></polyline>
                     </svg>
                   )}
-                  {formatNumber(portfolioStats[ticker]?.unrealizedDollar)}{" "}
-                  {/* (
-                {formatPercentage(portfolioStats[ticker]?.unrealizedPercentage)}
-                ) */}
+                  {formatPercentage(portfolioStats[ticker]?.unrealizedPercentage)}
                 </p>
               </div>
             </div>
@@ -553,15 +548,17 @@ const Portfolio = () => {
       </>
     );
   };
-  const formatCurrency = (value: number) => {
+  const formatCurrency = (value: number, fraction: number = 2) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD",
+      maximumFractionDigits: fraction, minimumFractionDigits: fraction
     }).format(value);
   };
-  const formatNumber = (value: number) => {
+  const formatNumber = (value: number, fraction: number = 2) => {
     return new Intl.NumberFormat("en-US", {
       currency: "USD",
+      maximumFractionDigits: fraction, minimumFractionDigits: fraction
     }).format(value);
   };
   const addCash = async () => {
@@ -595,6 +592,22 @@ const Portfolio = () => {
       event.preventDefault();
     }
   };
+  // Function to determine opacity based on change
+  const getOpacity = (change: number) => {
+    if (change <= 1) return 0.2;
+    if (change <= 3) return 0.3;
+    if (change <= 5) return 0.4;
+    if (change <= 10) return 0.5;
+    if (change <= 15) return 0.6;
+    return 0.7;
+  };
+  const getTransactionStyle = (type: string, changePercent : number) => {
+    const op = getOpacity(Math.abs(changePercent))
+    const color = changePercent > 0 ? "0, 255, 0" : "255, 0, 0";
+    const backgroundColor = type === "buy" ? `rgba(${color}, ${op})` : "transparent"
+    const border = type !== "buy" ? `0.5px solid rgba(${color})` : "none"
+    return { backgroundColor, border }
+  }
 
   return (
     <>
@@ -607,9 +620,9 @@ const Portfolio = () => {
               className="headingport"
               style={{ display: "flex", alignItems: "center" }}
             >
-              {cashBalance && Number(assetsValue) && (
+              { currentPrice && (
                 <AnimatedNumber
-                  value={(cashBalance + Number(assetsValue)).toFixed(2)}
+                  value={(currentPrice).toFixed(2)}
                   duration={500}
                   format={(val) => `${val.toFixed(2)}`}
                 />
@@ -646,13 +659,13 @@ const Portfolio = () => {
         </div>
 
         <div className="row">
-          <div className="col-12 border_btm_dotted" style={{ padding: 0 }}>
+          <div className="col-12" style={{ padding: 0 }}>
             {sampleData.length > 0 && (
               <PortFolioGraph
                 data={sampleData}
-                currentPrice={setcurrentPrice}
-                cashBalance={setCashBalance}
-                assetsValue={assetsValue}
+                setcurrentPrice={setcurrentPrice}
+                currentPrice={currentPrice2}
+                previousPrice={previousPrice}
               />
             )}
           </div>
@@ -875,7 +888,7 @@ const Portfolio = () => {
           </div>
         </div>
 
-        <div className="row mb-5 mt-2 pb-5">
+        <div className="row mb-5 mt-2 py-5">
           <div className="col-12 mt-2">
             <h2 className="trans_history_head mb-3 pb-1">
               Transaction history
@@ -892,11 +905,8 @@ const Portfolio = () => {
             {TradeHistory.map((item: any, key: any) => (
               <div
                 key={key}
-                className={
-                  item.changePercentage < 0
-                    ? "card_trans_histor trhsh4  mb-3"
-                    : "card_trans_histor  trhsh1 mb-3"
-                }
+                className="card_trans_histor mb-3"
+                style={getTransactionStyle(item.type, item.changePercentage)}
               >
                 <p className="tran_hitr_p">
                   {item.type == "buy" ? "BUY" : "SELL"} -{" "}
@@ -905,7 +915,7 @@ const Portfolio = () => {
                 <div className="row">
                   <div className="col-12 py-2 d-flex">
                     <p className="tran_hitr_p fix_wwed">{item.ticker} </p>
-                    <p className="tran_hitr_p2">{item.name}</p>
+                    <p className="tran_hitr_p2">{tickerCompanyMap[item.ticker]}</p>
                   </div>
                   <div className="col-6 py-1  d-flex">
                     <p className="tran_hitr_p fix_wwed">Price </p>
@@ -920,7 +930,7 @@ const Portfolio = () => {
                           : "tran_hitr_p2 postive_clr "
                       }
                     >
-                      {formatNumber(item.changePercentage)}%
+                      {formatNumber(item.changePercentage * item.totalAmount / 100)}
                     </p>
                   </div>
                   <div className="col-6 py-1 d-flex">
@@ -938,7 +948,7 @@ const Portfolio = () => {
                           : "tran_hitr_p2 postive_clr "
                       }
                     >
-                      {formatCurrency(item.currentPrice - item.price)}
+                      {formatNumber(item.changePercentage)}%
                     </p>
                   </div>
                   <div className="col-6 py-1 d-flex">
@@ -948,10 +958,9 @@ const Portfolio = () => {
                     </p>
                   </div>
                   <div className="col-6 py-1 d-flex">
-                    <p className="tran_hitr_p fix_wwed2">PV: </p>
+                    <p className="tran_hitr_p fix_wwed2">MV: </p>
                     <p className="tran_hitr_p2 ">
-                      N/A
-                      {/* ${item.totalCashHeldAtDate.toFixed(2)} */}
+                    {formatCurrency(item.currentPrice * item.quantity)}
                     </p>
                   </div>
                 </div>
@@ -1968,7 +1977,7 @@ const Portfolio = () => {
           <Sheet.Header style={{ background: "#000" }} />
           <Sheet.Content style={{ background: "#000" }}>
             <Sheet.Scroller draggableAt="both">
-              <MarketSearch stockData={stockData} />
+              <MarketSearch />
             </Sheet.Scroller>
           </Sheet.Content>
         </Sheet.Container>

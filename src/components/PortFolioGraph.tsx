@@ -1,22 +1,39 @@
 import dayjs from "dayjs";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
-import { useState } from "react";
 
 interface LineChartProps {
   data: [];
+  setcurrentPrice: any;
   currentPrice: any;
-  cashBalance: any;
-  assetsValue: any;
+  previousPrice: any;
 }
 const PortFolioGraph: React.FC<LineChartProps> = ({
   data,
+  setcurrentPrice,
   currentPrice,
-  cashBalance,
-  assetsValue,
+  previousPrice,
 }) => {
-  const [plotLineId, setPlotLineId] = useState<string | null>(null);
   const chartOptions = {
+    plotOptions: {
+      series: {
+        point : {
+          events: {
+            mouseOut : (e: any) => {
+              e.target.series.chart.xAxis[0].removePlotLine();
+              previousPrice && e.target.series.chart.yAxis[0].addPlotLine({
+                value: previousPrice,
+                color: "gray",
+                dashStyle: "Dot",
+                width: 1,
+                zIndex: 5,
+              })
+              setcurrentPrice(currentPrice)
+            }
+          }
+        }
+      }
+    },
     chart: {
       type: "line",
       backgroundColor: "transparent",
@@ -32,7 +49,20 @@ const PortFolioGraph: React.FC<LineChartProps> = ({
       },
     },
     yAxis: {
-      visible: false, // Hides the y-axis
+      plotLines: [
+        {
+          value: previousPrice,
+          color: "gray",
+          dashStyle: "Dot",
+          width: 1,
+          zIndex: 5,
+        }
+      ],
+      visible: true, // Hides the y-axis
+      labels: {
+        enabled: false, // This hides only the y-axis labels
+      },
+      gridLineWidth: 0
     },
     legend: {
       enabled: false, // Hides the legend
@@ -52,12 +82,11 @@ const PortFolioGraph: React.FC<LineChartProps> = ({
 
     tooltip: {
       shared: true,
-      backgroundColor: "#333333", // Change tooltip background color here
+      backgroundColor: "transparent",
       style: {
         color: "#ffffff", // Change text color in the tooltip
       },
-      positioner: (labelWidth: any, labelHeight: any, point: any) => {
-        console.log(labelWidth, labelHeight);
+      positioner: (_: any, __: any, point: any) => {
         var tooltipX = point.plotX - 60;
         var tooltipY = 0;
         return {
@@ -66,33 +95,20 @@ const PortFolioGraph: React.FC<LineChartProps> = ({
         };
       },
       formatter: function (
-        this: Highcharts.TooltipFormatterContextObject
+        this: any
       ): any {
-        const currentPrice1 = this.y; // Access y-value
-        currentPrice(currentPrice1);
-        cashBalance(Number(currentPrice1) - assetsValue);
+        setcurrentPrice(this.y);
         const xValue = this.x;
-
-        // Remove the old plot line if it exists
-        if (plotLineId) {
-          this.points![0].series.chart.xAxis[0].removePlotLine(plotLineId);
-        }
-
-        // Add a new plot line at the current x position
-        const newPlotLineId = "tooltip-line";
         this.points![0].series.chart.xAxis[0].addPlotLine({
           value: Number(xValue),
           color: "gray",
           dashStyle: "Dot",
           width: 1,
           zIndex: 5,
-          id: newPlotLineId,
         });
 
-        setPlotLineId(newPlotLineId);
-        return `<strong>${dayjs(xValue).format(
-          "MMM DD, YYYY h:mm A"
-        )}</strong>`;
+        this.points![0].series.chart.yAxis[0].removePlotLine();
+        return `${dayjs(xValue).format("MMM DD, YYYY h:mm A")}`;
       },
     },
   };
