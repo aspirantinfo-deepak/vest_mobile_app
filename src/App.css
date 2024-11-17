@@ -248,7 +248,6 @@ footer {
   font-size: 13px;
   margin-right: 10px;
   padding: 1px 8px;
-  text-transform: uppercase !important;
 }
 .dayul li.active {
   border: 1px solid #00ff00;
@@ -1049,7 +1048,7 @@ footer {
 }
 
 .negtve {
-  color: #ca222c;
+  color: #ff0000;
 }
 
 .shd4 {
@@ -1069,7 +1068,7 @@ footer {
   font-family: SF-Pro-Display-Medium;
   margin: 0;
   font-size: 15px;
-  color: rgba(255, 255, 255, 0.2);
+  color: rgba(179, 179, 179, 0.7);
 }
 
 .tran_hitr_p2 {
@@ -1107,7 +1106,7 @@ footer {
 }
 
 .neg_clr {
-  color: #ca222c;
+  color: #ff0000;
 }
 
 .btn_customes::placeholder {
@@ -1188,18 +1187,6 @@ footer {
 }
 .highcharts-axis {
   display: none !important;
-}
-
-.highcharts-root {
-  .highcharts-plot-line {
-    display: none;
-  }
-}
-
-.highcharts-root:hover {
-  .highcharts-plot-line {
-    display: block;
-  }
 }
 
 .modal_picks {

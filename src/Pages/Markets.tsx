@@ -163,7 +163,7 @@ const Markets = () => {
                     }}
                   >
                     <div className="col-8 ">
-                      <p className="company_name">{it.ticker}</p>
+                      <p className="company_name">{it.companyName}</p>
                       <p className="stockname">{it.ticker}</p>
                     </div>
                     <div className="col-4 text-right">
