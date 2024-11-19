@@ -805,7 +805,7 @@ const MarketSearch = (props: any) => {
 
           <div className="row">
             <div className="col-12" style={{ padding: 0 }}>
-              {sampleData.length > 0 && previousPrice && (
+              {sampleData.length > 0 && (
                 <StockGraph
                   data={sampleData}
                   currentPrice={currentPrice2}

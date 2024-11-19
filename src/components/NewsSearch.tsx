@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { postRequest } from "../services/axiosService";
 import FullScreenLoader from "./FullScreenLoader";
-import { toast } from "react-toastify";
+// import { toast } from "react-toastify";
 // import n1 from "../assets/n1.png";
 // import n2 from "../assets/n2.png";
 const NewsSearch = (props: any) => {
@@ -21,7 +21,7 @@ const NewsSearch = (props: any) => {
     getNews();
     if (props.newsDetails) {
       console.log(props.newsDetails);
-      setshowSearchButton(true);
+      // setshowSearchButton(true);
       setisSaved(true);
       setremoveNewsID(props.newsDetails._id);
       setkeyword(props.newsDetails.keyword);
@@ -117,7 +117,7 @@ const NewsSearch = (props: any) => {
             setisSaved(false);
           }
         } else {
-          toast.error(response.data.message);
+          // toast.error(response.data.message);
         }
       }
     } catch (error: any) {

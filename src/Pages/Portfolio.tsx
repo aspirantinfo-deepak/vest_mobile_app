@@ -671,7 +671,7 @@ const Portfolio = () => {
 
         <div className="row">
           <div className="col-12" style={{ padding: 0 }}>
-            {sampleData.length > 0 && currentPrice2 && previousPrice && (
+            {sampleData.length > 0 && currentPrice2 && (
               <PortFolioGraph
                 data={sampleData}
                 setcurrentPrice={setcurrentPrice}
