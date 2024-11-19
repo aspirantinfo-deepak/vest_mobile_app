@@ -113,7 +113,7 @@ export const fetchCompanyDetails = async (
 ) => {
   try {
     const companyResponse = await getRequest(
-      `/api/polygon/stock/${ticker}/company-details` // Call your backend API
+      `/api/markets/stock/${ticker}/company-details` // Call your backend API
     );
     const companyInfo = companyResponse.data;
     if (typeof setCompanyDetailsFetched === "function") {

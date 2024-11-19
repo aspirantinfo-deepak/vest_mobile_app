@@ -23,7 +23,7 @@ const CreateAccount = () => {
   const formSchema = Yup.object().shape({
     name: Yup.string()
       .required("Name is required")
-      .min(3, "Username has minium 3 charater")
+      .min(3, "Name has minium 3 charater")
       .matches(/^[A-Za-z\s]+$/, "Name must contain only alphabets")
       .matches(/^.*\S.*$/, "Whitespace is not allowed")
       .strict(true),

@@ -204,7 +204,7 @@ const Portfolio = () => {
       timespan = intervalArray[1];
 
       const response: any = await getRequest(
-        "/api/polygon/portfolio/datapoints",
+        "/api/markets/portfolio/datapoints",
         {
           params: {
             multiplier,
@@ -401,7 +401,7 @@ const Portfolio = () => {
       try {
         const pricePromises = mainPortfolio.assets.map((stock: any) => {
           const ticker = stock.ticker.toUpperCase();
-          return getRequest(`/api/polygon/dailychange?ticker=${ticker}`)
+          return getRequest(`/api/markets/dailychange?ticker=${ticker}`)
             .then((response: any) => ({
               ticker,
               price: response.data.currentPrice.toFixed(2),
@@ -457,9 +457,15 @@ const Portfolio = () => {
         {keysToUse.map((ticker: any, i: number) => (
           <>
             <div
-              className={"row py-3 stock_names_prrice" + (i === keysToUse.length - 1 ? "" : " border-bottom1")}
+              className={
+                "row py-3 stock_names_prrice" +
+                (i === keysToUse.length - 1 ? "" : " border-bottom1")
+              }
               onClick={() => {
-                localStorage.setItem("currentTicker", JSON.stringify({ticker : ticker}));
+                localStorage.setItem(
+                  "currentTicker",
+                  JSON.stringify({ ticker: ticker })
+                );
                 navigate("/marketdetail");
               }}
             >
@@ -515,7 +521,9 @@ const Portfolio = () => {
                       <polyline points="5 12 12 5 19 12"></polyline>
                     </svg>
                   )}
-                  {formatPercentage(portfolioStats[ticker]?.unrealizedPercentage)}
+                  {formatPercentage(
+                    portfolioStats[ticker]?.unrealizedPercentage
+                  )}
                 </p>
               </div>
             </div>
@@ -552,13 +560,15 @@ const Portfolio = () => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD",
-      maximumFractionDigits: fraction, minimumFractionDigits: fraction
+      maximumFractionDigits: fraction,
+      minimumFractionDigits: fraction,
     }).format(value);
   };
   const formatNumber = (value: number, fraction: number = 2) => {
     return new Intl.NumberFormat("en-US", {
       currency: "USD",
-      maximumFractionDigits: fraction, minimumFractionDigits: fraction
+      maximumFractionDigits: fraction,
+      minimumFractionDigits: fraction,
     }).format(value);
   };
   const addCash = async () => {
@@ -601,13 +611,14 @@ const Portfolio = () => {
     if (change <= 15) return 0.6;
     return 0.7;
   };
-  const getTransactionStyle = (type: string, changePercent : number) => {
-    const op = getOpacity(Math.abs(changePercent))
+  const getTransactionStyle = (type: string, changePercent: number) => {
+    const op = getOpacity(Math.abs(changePercent));
     const color = changePercent > 0 ? "0, 255, 0" : "255, 0, 0";
-    const backgroundColor = type === "buy" ? `rgba(${color}, ${op})` : "transparent"
-    const border = type !== "buy" ? `0.5px solid rgba(${color})` : "none"
-    return { backgroundColor, border }
-  }
+    const backgroundColor =
+      type === "buy" ? `rgba(${color}, ${op})` : "transparent";
+    const border = type !== "buy" ? `0.5px solid rgba(${color})` : "none";
+    return { backgroundColor, border };
+  };
 
   return (
     <>
@@ -620,9 +631,9 @@ const Portfolio = () => {
               className="headingport"
               style={{ display: "flex", alignItems: "center" }}
             >
-              { currentPrice && (
+              {currentPrice && (
                 <AnimatedNumber
-                  value={(currentPrice).toFixed(2)}
+                  value={currentPrice.toFixed(2)}
                   duration={500}
                   format={(val) => `${val.toFixed(2)}`}
                 />
@@ -639,7 +650,7 @@ const Portfolio = () => {
                 calculatePercentageChange(currentPrice, previousPrice)}
               %)&nbsp;
               <span>
-                {filter == "live" && "live"} {filter == "1d" && "past day"}{" "}
+                {filter == "live" && "today"} {filter == "1d" && "past day"}{" "}
                 {filter == "1w" && "past week"}{" "}
                 {filter == "3m" && "past 3 months"}{" "}
                 {filter == "1y" && "past year"} {filter == "all time" && "all"}
@@ -660,7 +671,7 @@ const Portfolio = () => {
 
         <div className="row">
           <div className="col-12" style={{ padding: 0 }}>
-            {sampleData.length > 0 && (
+            {sampleData.length > 0 && currentPrice2 && previousPrice && (
               <PortFolioGraph
                 data={sampleData}
                 setcurrentPrice={setcurrentPrice}
@@ -880,8 +891,7 @@ const Portfolio = () => {
             </p>
 
             <p>
-              <span>Portfolio opened:</span>
-              {!portfolioStartDate && "N/A"}
+              <span>Portfolio opened:</span> {!portfolioStartDate && "N/A"}
               {portfolioStartDate &&
                 dayjs(portfolioStartDate).format("MMM DD, YYYY")}
             </p>
@@ -910,12 +920,14 @@ const Portfolio = () => {
               >
                 <p className="tran_hitr_p">
                   {item.type == "buy" ? "BUY" : "SELL"} -{" "}
-                  {dayjs(item.date).format("MMMM DD, YYYY hh:mm A")}{" "}
+                  {dayjs(item.date).format("MMMM DD, YYYY HH:mm:ss EST")}{" "}
                 </p>
                 <div className="row">
                   <div className="col-12 py-2 d-flex">
                     <p className="tran_hitr_p fix_wwed">{item.ticker} </p>
-                    <p className="tran_hitr_p2">{tickerCompanyMap[item.ticker]}</p>
+                    <p className="tran_hitr_p2">
+                      {tickerCompanyMap[item.ticker]}
+                    </p>
                   </div>
                   <div className="col-6 py-1  d-flex">
                     <p className="tran_hitr_p fix_wwed">Price </p>
@@ -930,7 +942,9 @@ const Portfolio = () => {
                           : "tran_hitr_p2 postive_clr "
                       }
                     >
-                      {formatNumber(item.changePercentage * item.totalAmount / 100)}
+                      {formatNumber(
+                        (item.changePercentage * item.totalAmount) / 100
+                      )}
                     </p>
                   </div>
                   <div className="col-6 py-1 d-flex">
@@ -960,7 +974,7 @@ const Portfolio = () => {
                   <div className="col-6 py-1 d-flex">
                     <p className="tran_hitr_p fix_wwed2">MV: </p>
                     <p className="tran_hitr_p2 ">
-                    {formatCurrency(item.currentPrice * item.quantity)}
+                      {formatCurrency(item.currentPrice * item.quantity)}
                     </p>
                   </div>
                 </div>

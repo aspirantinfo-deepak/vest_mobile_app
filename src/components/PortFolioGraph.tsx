@@ -17,22 +17,23 @@ const PortFolioGraph: React.FC<LineChartProps> = ({
   const chartOptions = {
     plotOptions: {
       series: {
-        point : {
+        point: {
           events: {
-            mouseOut : (e: any) => {
+            mouseOut: (e: any) => {
               e.target.series.chart.xAxis[0].removePlotLine();
-              previousPrice && e.target.series.chart.yAxis[0].addPlotLine({
-                value: previousPrice,
-                color: "gray",
-                dashStyle: "Dot",
-                width: 1,
-                zIndex: 5,
-              })
-              setcurrentPrice(currentPrice)
-            }
-          }
-        }
-      }
+              // previousPrice &&
+              //   e.target.series.chart.yAxis[0].addPlotLine({
+              //     value: previousPrice,
+              //     color: "gray",
+              //     dashStyle: "Dot",
+              //     width: 1,
+              //     zIndex: 5,
+              //   });
+              setcurrentPrice(currentPrice);
+            },
+          },
+        },
+      },
     },
     chart: {
       type: "line",
@@ -56,13 +57,17 @@ const PortFolioGraph: React.FC<LineChartProps> = ({
           dashStyle: "Dot",
           width: 1,
           zIndex: 5,
-        }
+        },
       ],
+
       visible: true, // Hides the y-axis
       labels: {
         enabled: false, // This hides only the y-axis labels
       },
-      gridLineWidth: 0
+      title: {
+        text: null, // Hides the y-axis title
+      },
+      gridLineWidth: 0,
     },
     legend: {
       enabled: false, // Hides the legend
@@ -79,10 +84,9 @@ const PortFolioGraph: React.FC<LineChartProps> = ({
         },
       },
     ],
-
     tooltip: {
       shared: true,
-      backgroundColor: "transparent",
+      backgroundColor: "black",
       style: {
         color: "#ffffff", // Change text color in the tooltip
       },
@@ -94,9 +98,7 @@ const PortFolioGraph: React.FC<LineChartProps> = ({
           y: tooltipY,
         };
       },
-      formatter: function (
-        this: any
-      ): any {
+      formatter: function (this: any): any {
         setcurrentPrice(this.y);
         const xValue = this.x;
         this.points![0].series.chart.xAxis[0].addPlotLine({

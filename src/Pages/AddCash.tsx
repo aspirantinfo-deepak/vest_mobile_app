@@ -118,6 +118,7 @@ const AddCash = () => {
             )}
             {isConfirm && (
               <button
+                disabled={isLoading}
                 className="buy_shares_btn confirm_cash2"
                 onClick={() => addCash()}
               >

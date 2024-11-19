@@ -252,53 +252,66 @@ const MarketSearch = (props: any) => {
   };
   const getStockGraph = async () => {
     try {
-      const timeValues: {[key : string]: any} = {
-        "live": {
-          from : (date: Date) => date.setTime(date.getTime() - 1000 * 60 * 5) && date,
+      const timeValues: { [key: string]: any } = {
+        live: {
+          from: (date: Date) =>
+            date.setTime(date.getTime() - 1000 * 60 * 5) && date,
           multiplier: 1,
-          timespan: "second"
+          timespan: "second",
         },
         "1h": {
-          from : (date: Date) => date.setTime(date.getTime() - 1000 * 60 * 60) && date,
+          from: (date: Date) =>
+            date.setTime(date.getTime() - 1000 * 60 * 60) && date,
           multiplier: 14,
-          timespan: "second"
+          timespan: "second",
         },
         "1d": {
-          from : (date: Date) => date.setDate(date.getDate() - 1) && date,
+          from: (date: Date) => date.setDate(date.getDate() - 1) && date,
           multiplier: 1,
-          timespan: "minute"
+          timespan: "minute",
         },
         "1w": {
-          from : (date: Date) => date.setDate(date.getDate() - 7) && date,
+          from: (date: Date) => date.setDate(date.getDate() - 7) && date,
           multiplier: 15,
-          timespan: "minute"
+          timespan: "minute",
         },
         "3m": {
-          from : (date: Date) => date.setMonth(date.getMonth() - 3) && date,
+          from: (date: Date) => date.setMonth(date.getMonth() - 3) && date,
           multiplier: 1,
-          timespan: "day"
+          timespan: "day",
         },
         "1y": {
-          from : (date: Date) => date.setFullYear(date.getFullYear() - 1) && date,
+          from: (date: Date) =>
+            date.setFullYear(date.getFullYear() - 1) && date,
           multiplier: 1,
-          timespan: "day"
+          timespan: "day",
         },
-        "all": {
-          from : () => new Date('August 01, 2003'),
+        all: {
+          from: () => new Date("August 01, 2003"),
           multiplier: 1,
-          timespan: "week"
+          timespan: "week",
         },
-      }
+      };
       const currentDate = new Date();
       const oldDate = timeValues[interval].from(new Date(currentDate));
-      
+
       // setIsLoading(true);
-      const url = "/api/polygon/stock/datapoints?" +
-                  "ticker=" + ticker + "&" +
-                  "fromDateUnixMs=" + oldDate.getTime() + "&" +
-                  "toDateUnixMs=" + currentDate.getTime() + "&" +
-                  "multiplier=" + timeValues[interval].multiplier + "&" +
-                  "timespan=" + timeValues[interval].timespan;
+      const url =
+        "/api/markets/stock/datapoints?" +
+        "ticker=" +
+        ticker +
+        "&" +
+        "fromDateUnixMs=" +
+        oldDate.getTime() +
+        "&" +
+        "toDateUnixMs=" +
+        currentDate.getTime() +
+        "&" +
+        "multiplier=" +
+        timeValues[interval].multiplier +
+        "&" +
+        "timespan=" +
+        timeValues[interval].timespan;
       const response = await getRequest<any>(url);
       setIsLoading(false);
       setsampleData([]);
@@ -309,8 +322,8 @@ const MarketSearch = (props: any) => {
         for (var i = 0; i < response.data.length; i++) {
           demosampleData.push({
             y: response.data[i].c,
-            x: i,
-            t: response.data[i].t
+            x: response.data[i].t,
+            t: response.data[i].t,
           });
         }
         setsampleData(demosampleData);
@@ -364,10 +377,13 @@ const MarketSearch = (props: any) => {
           setquantity("");
           setIsModal(false);
           getStockBUYSELL();
+          fetchUserCashBalance(setCashBalance);
+          fetchUserPortfolio(setUserPortfolio);
         } else {
           if (Number(quantity) > totalBUY) {
             toast.error("You don't have enough stock to sell");
           } else {
+            setIsLoading(true);
             const response = await postRequest<any>("/api/stockActions/sell", {
               ticker: ticker,
               assetType: type,
@@ -380,6 +396,8 @@ const MarketSearch = (props: any) => {
             setisStockDetails(2);
             setquantity("");
             getStockBUYSELL();
+            fetchUserCashBalance(setCashBalance);
+            fetchUserPortfolio(setUserPortfolio);
           }
         }
       } catch (error: any) {
@@ -416,7 +434,7 @@ const MarketSearch = (props: any) => {
     const change = ((currentPrice1 - previousPrice1) / previousPrice1) * 100;
     return change.toLocaleString(undefined, {
       minimumFractionDigits: 2,
-      maximumFractionDigits: 2
+      maximumFractionDigits: 2,
     });
   };
   const handleKeyPress = (e: any) => {
@@ -427,7 +445,7 @@ const MarketSearch = (props: any) => {
   const getActiveWatchList = async () => {
     try {
       const response = await getRequest<any>(
-        `/api/polygon/stocklists/watchlist`,
+        `/api/markets/stocklists/watchlist`,
         {}
       );
       console.log(response.data);
@@ -449,7 +467,7 @@ const MarketSearch = (props: any) => {
     try {
       e.stopPropagation();
       // setIsLoading(true);
-      const response = await getRequest<any>("/api/polygon/stocklists/", {});
+      const response = await getRequest<any>("/api/markets/stocklists/", {});
       setIsLoading(false);
       if (response.status == 200) {
         console.log(response.data);
@@ -466,7 +484,7 @@ const MarketSearch = (props: any) => {
       // e.stopPropagation();
       // setIsLoading(true);
       const response = await postRequest<any>(
-        "/api/polygon/stocklists/" + id + "/stocks",
+        "/api/markets/stocklists/" + id + "/stocks",
         {
           ticker: ticker,
         }
@@ -485,7 +503,7 @@ const MarketSearch = (props: any) => {
     try {
       // setIsLoading(true);
       const response = await deleteRequest<any>(
-        "/api/polygon/stocklists/watchlist/" + ticker
+        "/api/markets/stocklists/watchlist/" + ticker
       );
       setIsLoading(false);
       if (response.status == 200) {
@@ -590,7 +608,6 @@ const MarketSearch = (props: any) => {
                 Indexes
               </button>
             </div>
-
           </div>
           <div className="row pt-4">
             <div className="col-12">
@@ -765,7 +782,7 @@ const MarketSearch = (props: any) => {
                 {calculatePercentageChange(currentPrice, previousPrice)}
                 %)&nbsp;
                 <span>
-                  {interval == "live" && "live"}{" "}
+                  {interval == "live" && "today"}{" "}
                   {interval == "1h" && "past hour"}{" "}
                   {interval == "1d" && "past day"}{" "}
                   {interval == "1w" && "past week"}{" "}
@@ -779,7 +796,7 @@ const MarketSearch = (props: any) => {
 
           <div className="row">
             <div className="col-12" style={{ padding: 0 }}>
-              {sampleData.length > 0 && (
+              {sampleData.length > 0 && previousPrice && (
                 <StockGraph
                   data={sampleData}
                   currentPrice={currentPrice2}
@@ -885,64 +902,73 @@ const MarketSearch = (props: any) => {
             </div>
           </div>
 
-          <div className="row  mt-4">
-            <div className="col-12 pt-2">
-              <h3 className="subheading m-0">Your position</h3>
-            </div>
-          </div>
-
-          <div className="row mt-3">
-            <div className="col-4 mb-3">
-              <p className="para5">Shares</p>
-              <p className="para6">
-                {userTickerPosition?.quantity &&
-                  formatCurrency3(userTickerPosition?.quantity)}
-                {!userTickerPosition?.quantity && "--"}
-              </p>
-            </div>
-            <div className="col-4 mb-3">
-              <p className="para5">Market value</p>
-              <p className="para6">
-                {userTickerPosition?.quantity &&
-                  formatCurrency2(userTickerPosition?.quantity * currentPrice)}
-                {!userTickerPosition?.quantity && "--"}
-              </p>
-            </div>
-            <div className="col-4 mb-3">
-              <p className="para5">Average cost</p>
-              <p className="para6">
-                {" "}
-                {userTickerPosition?.avgBuyPrice &&
-                  formatCurrency2(userTickerPosition?.avgBuyPrice)}
-                {!userTickerPosition?.avgBuyPrice && "--"}
-              </p>
-            </div>
-            <div className="col-4 mb-3">
-              <p className="para5">ROI $</p>
-              <p className="para6">
-                {returnData ? (
-                  <>
-                    {returnData?.realizedDollar >= 0 ? "+" : ""}
-                    {fc(returnData.realizedDollar)}
-                  </>
-                ) : (
-                  "--"
-                )}
-              </p>
-            </div>
-            <div className="col-4 mb-3">
-              <p className="para5">ROI %</p>
-              <p
-                className={
-                  returnData?.realizedDollar >= 0
-                    ? "para6 clr_grn"
-                    : "para6 clr_red"
-                }
-              >
-                {returnData ? <> {fc(returnData.realizedPercentage)}%</> : "--"}
-              </p>
-            </div>
-          </div>
+          {userTickerPosition?.quantity && (
+            <>
+              <div className="row  mt-4">
+                <div className="col-12 pt-2">
+                  <h3 className="subheading m-0">Your position</h3>
+                </div>
+              </div>
+              <div className="row mt-3">
+                <div className="col-4 mb-3">
+                  <p className="para5">Shares</p>
+                  <p className="para6">
+                    {userTickerPosition?.quantity &&
+                      formatCurrency3(userTickerPosition?.quantity)}
+                    {!userTickerPosition?.quantity && "--"}
+                  </p>
+                </div>
+                <div className="col-4 mb-3">
+                  <p className="para5">Market value</p>
+                  <p className="para6">
+                    {userTickerPosition?.quantity &&
+                      formatCurrency2(
+                        userTickerPosition?.quantity * currentPrice
+                      )}
+                    {!userTickerPosition?.quantity && "--"}
+                  </p>
+                </div>
+                <div className="col-4 mb-3">
+                  <p className="para5">Average cost</p>
+                  <p className="para6">
+                    {" "}
+                    {userTickerPosition?.avgBuyPrice &&
+                      formatCurrency2(userTickerPosition?.avgBuyPrice)}
+                    {!userTickerPosition?.avgBuyPrice && "--"}
+                  </p>
+                </div>
+                <div className="col-4 mb-3">
+                  <p className="para5">ROI $</p>
+                  <p className="para6">
+                    {returnData ? (
+                      <>
+                        {returnData?.realizedDollar >= 0 ? "+" : ""}
+                        {fc(returnData.realizedDollar)}
+                      </>
+                    ) : (
+                      "--"
+                    )}
+                  </p>
+                </div>
+                <div className="col-4 mb-3">
+                  <p className="para5">ROI %</p>
+                  <p
+                    className={
+                      returnData?.realizedDollar >= 0
+                        ? "para6 clr_grn"
+                        : "para6 clr_red"
+                    }
+                  >
+                    {returnData ? (
+                      <> {fc(returnData.realizedPercentage)}%</>
+                    ) : (
+                      "--"
+                    )}
+                  </p>
+                </div>
+              </div>
+            </>
+          )}
 
           <div className="row  mt-4">
             <div className="col-12">
@@ -1040,8 +1066,11 @@ const MarketSearch = (props: any) => {
             <div className="col-4 mb-3">
               <p className="para5">Div/Yield</p>
               <p className="para6">
-                  {(((stockDetail?.dividend || 0) * 100 / currentPrice2)?.toFixed(2) + "%") || "--"}
-                </p>
+                {(
+                  ((stockDetail?.dividend || 0) * 100) /
+                  currentPrice2
+                )?.toFixed(2) + "%" || "--"}
+              </p>
             </div>
             <div className="col-4 mb-3">
               <p className="para5">Low</p>
@@ -1186,7 +1215,9 @@ const MarketSearch = (props: any) => {
               <p className="para7">Share price</p>
             </div>
             <div className="col-6 px-3 text-right px-0">
-              <p className="para7 wei-bold">${currentPrice2.toFixed(2)}</p>
+              <p className="para7 wei-bold">
+                ${currentPrice2 && currentPrice2.toFixed(2)}
+              </p>
             </div>
           </div>
           <div className="row  pb-3 pt-3">
@@ -1195,7 +1226,7 @@ const MarketSearch = (props: any) => {
             </div>
             <div className="col-6 px-3 text-right px-0">
               <p className="para7 wei-bold">
-                {formatCurrency2(currentPrice2 * quantity)}
+                {currentPrice2 && formatCurrency2(currentPrice2 * quantity)}
               </p>
             </div>
           </div>
@@ -1208,7 +1239,7 @@ const MarketSearch = (props: any) => {
                       // setIsModal(true);
                       setisConfirm(true);
                     } else {
-                      toast.error("Please enter valid quantity");
+                      // toast.error("Please enter valid quantity");
                     }
                   }}
                   className="buy_shares_btn"
@@ -1218,6 +1249,7 @@ const MarketSearch = (props: any) => {
               )}
               {isConfirm && (
                 <button
+                  disabled={isLoading}
                   className="buy_shares_btn confirm_cash2"
                   onClick={() => buyStiock()}
                 >
@@ -1353,7 +1385,7 @@ const MarketSearch = (props: any) => {
                 <div className="row">
                   <div className="col-12 text-center mt-3">
                     <button
-                      disabled={!amount || amount <= 0}
+                      disabled={isLoading}
                       className="btn_okfineyes"
                       onClick={() => addCash()}
                     >

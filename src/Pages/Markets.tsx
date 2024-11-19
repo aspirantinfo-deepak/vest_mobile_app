@@ -64,7 +64,7 @@ const Markets = () => {
   const getStockWatchList = async () => {
     try {
       setIsLoading(true);
-      const response = await getRequest<any>("/api/polygon/stocklists/", {});
+      const response = await getRequest<any>("/api/markets/stocklists/", {});
       setIsLoading(false);
       if (response.status == 200) {
         console.log(response.data);
@@ -235,7 +235,9 @@ const Markets = () => {
 
         <div className="row mt-4 pt-2">
           <div className="col-12">
-            <button className="add_assets_btn" onClick={() => setOpen(true)}>Add stock +</button>
+            <button className="add_assets_btn" onClick={() => setOpen(true)}>
+              Add stock +
+            </button>
           </div>
         </div>
       </div>

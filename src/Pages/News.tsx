@@ -192,7 +192,13 @@ const News = () => {
                 setnewsDetails(item);
               }}
             >
-              <div className="col-12 px-0 border-bottom1 pb-4">
+              <div
+                className={
+                  newsList.length - 1 == key
+                    ? "col-12 px-0  pb-4"
+                    : "col-12 px-0 border-bottom1 pb-4"
+                }
+              >
                 <p
                   className="company_name2"
                   style={{ textTransform: "capitalize" }}
@@ -203,8 +209,8 @@ const News = () => {
                   className="stockname2"
                   dangerouslySetInnerHTML={{
                     __html:
-                      item.description.length > 90
-                        ? item.description.slice(0, 90) + "..."
+                      item.description.length > 160
+                        ? item.description.slice(0, 160) + "..."
                         : item.description.split("\n").join("<br/>"),
                   }}
                 >
@@ -218,7 +224,9 @@ const News = () => {
 
         <div className="row mt-4 pt-2">
           <div className="col-12">
-            <button className="add_assets_btn" onClick={() => setisOpen(true)}>Add topic +</button>
+            <button className="add_assets_btn" onClick={() => setisOpen(true)}>
+              Add topic +
+            </button>
           </div>
         </div>
       </div>
@@ -226,8 +234,8 @@ const News = () => {
       <Sheet
         isOpen={isOpen}
         onClose={() => {
-          setisOpen(false)
-          setnewsDetails('')
+          setisOpen(false);
+          setnewsDetails("");
         }}
         // snapPoints={[1, 0.5, 0.25]}
         initialSnap={0}

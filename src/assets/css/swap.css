@@ -1,0 +1,15 @@
+.App {
+  touch-action: none;
+}
+
+.page-container {
+  width: 100vw;
+  height: 100vh;
+  will-change: transform;
+}
+
+.page {
+  min-width: 100vw;
+  height: 100vh;
+  background-color: transparent;
+}

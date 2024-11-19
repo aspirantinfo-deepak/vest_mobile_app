@@ -36,6 +36,7 @@ const Footer = () => {
               : ""
           }
           onClick={() => {
+            // props.currentPage(0);
             navigate("/news");
           }}
         >
@@ -45,6 +46,7 @@ const Footer = () => {
         <button
           className={location.pathname == "/market" ? "active" : ""}
           onClick={() => {
+            // props.currentPage(1);
             navigate("/market");
           }}
         >
@@ -54,6 +56,7 @@ const Footer = () => {
         <button
           className={location.pathname == "/portfolio" ? "active" : ""}
           onClick={() => {
+            // props.currentPage(2);
             navigate("/portfolio");
           }}
         >

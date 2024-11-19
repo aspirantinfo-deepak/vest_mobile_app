@@ -7,28 +7,34 @@ interface LineChartProps {
   data: [];
   currentPrice: any;
   setcurrentPrice: any;
-  previousPrice: any
+  previousPrice: any;
 }
-const StockGraph: React.FC<LineChartProps> = ({ data, setcurrentPrice, currentPrice, previousPrice }) => {
+const StockGraph: React.FC<LineChartProps> = ({
+  data,
+  setcurrentPrice,
+  currentPrice,
+  previousPrice,
+}) => {
   const chartOptions = {
     plotOptions: {
       series: {
-        point : {
+        point: {
           events: {
-            mouseOut : (e: any) => {
+            mouseOut: (e: any) => {
               e.target.series.chart.xAxis[0].removePlotLine();
-              previousPrice && e.target.series.chart.yAxis[0].addPlotLine({
-                value: previousPrice,
-                color: "gray",
-                dashStyle: "Dot",
-                width: 1,
-                zIndex: 5,
-              })
-              setcurrentPrice(currentPrice)
-            }
-          }
-        }
-      }
+              // previousPrice &&
+              //   e.target.series.chart.yAxis[0].addPlotLine({
+              //     value: previousPrice,
+              //     color: "gray",
+              //     dashStyle: "Dot",
+              //     width: 1,
+              //     zIndex: 5,
+              //   });
+              setcurrentPrice(currentPrice);
+            },
+          },
+        },
+      },
     },
     chart: {
       type: "line",
@@ -52,13 +58,16 @@ const StockGraph: React.FC<LineChartProps> = ({ data, setcurrentPrice, currentPr
           dashStyle: "Dot",
           width: 1,
           zIndex: 5,
-        }
+        },
       ],
       visible: true, // Hides the y-axis
       labels: {
         enabled: false, // This hides only the y-axis labels
       },
-      gridLineWidth: 0
+      title: {
+        text: null, // Hides the y-axis title
+      },
+      gridLineWidth: 0,
     },
     legend: {
       enabled: false, // Hides the legend
@@ -78,7 +87,7 @@ const StockGraph: React.FC<LineChartProps> = ({ data, setcurrentPrice, currentPr
 
     tooltip: {
       shared: true,
-      backgroundColor: "transparent",
+      backgroundColor: "black",
       style: {
         color: "#ffffff", // Change text color in the tooltip
       },
@@ -90,12 +99,10 @@ const StockGraph: React.FC<LineChartProps> = ({ data, setcurrentPrice, currentPr
           y: tooltipY,
         };
       },
-      formatter: function (
-        this: any
-      ): any {
+      formatter: function (this: any): any {
         setcurrentPrice(this.y);
         const xValue = this.x;
-        const tValue = this.t;
+        // const tValue = this.t;
         this.points![0].series.chart.xAxis[0].addPlotLine({
           value: Number(xValue), // Convert xValue to a number
           color: "gray",
@@ -104,7 +111,7 @@ const StockGraph: React.FC<LineChartProps> = ({ data, setcurrentPrice, currentPr
           zIndex: 5,
         });
         this.points![0].series.chart.yAxis[0].removePlotLine();
-        return `${dayjs(tValue).format("MMM DD, YYYY h:mm A")}`;
+        return `${dayjs(xValue).format("MMM DD, YYYY h:mm A")}`;
       },
     },
   };

@@ -195,7 +195,7 @@ const Settings = () => {
             </span>
           </div>
         </div>
-        <div className="row py-4 border-bottom1">
+        <div className="row py-4 ">
           <div className="col-8 px-0 ">
             <p className="m-0 set_para">Name</p>
           </div>
@@ -203,9 +203,6 @@ const Settings = () => {
             <p className="m-0 setpass">{name}</p>
           </div>
         </div>
-        
-
-        
 
         <div className="row">
           <div className="col-12 px-0">
