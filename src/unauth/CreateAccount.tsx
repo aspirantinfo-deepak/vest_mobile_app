@@ -6,7 +6,7 @@ import * as Yup from "yup";
 import { postRequest } from "../services/axiosService";
 import FullScreenLoader from "../components/FullScreenLoader";
 import { useState } from "react";
-import { toast } from "react-toastify";
+
 import useUserStore from "../zustand/userStore";
 
 interface User {
@@ -20,6 +20,7 @@ const CreateAccount = () => {
   const { setName, setEmail, setPhone, setUsername } = useUserStore();
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const [isError, setisError] = useState("");
   const formSchema = Yup.object().shape({
     name: Yup.string()
       .required("Name is required")
@@ -51,12 +52,13 @@ const CreateAccount = () => {
   });
   const formOptions = { resolver: yupResolver(formSchema) };
   const { register, handleSubmit, formState } = useForm(formOptions);
-  const { errors } = formState;
+  const { errors, isSubmitting } = formState;
   const onSubmit = handleSubmit(async (data: User) => {
+    setisError("");
     try {
       setIsLoading(true);
       const response: any = await postRequest<User>("/api/auth/signup", data);
-      toast.success(response.data);
+      setisError(response.data);
       setIsLoading(false);
       setName(data.name);
       setEmail(data.email);
@@ -67,7 +69,7 @@ const CreateAccount = () => {
     } catch (error: any) {
       setIsLoading(false);
       console.error("Error creating user:", error);
-      toast.error(error.response.data);
+      setisError(error.response.data);
     }
   });
   const numberOnlyValidation = (event: any) => {
@@ -86,7 +88,7 @@ const CreateAccount = () => {
         <div className="wrap_head pt-5 mt-5 px-5">
           <FullScreenLoader isLoading={isLoading} message="Please wait..." />
           <h2 className="shadowtext mt-5  mb-4">Moon</h2>
-          <form onSubmit={onSubmit} autoComplete="off">
+          <form autoComplete="off">
             <input
               autoComplete="off"
               type="text"
@@ -168,8 +170,24 @@ const CreateAccount = () => {
             >
               {errors.phone?.message}
             </span>
-            <button type="submit" className="btn_create_account mt-4">
-              Create account
+            {isError && (
+              <span
+                style={{
+                  color: "#fff",
+                  fontSize: "14px",
+                  marginTop: "10px",
+                }}
+              >
+                {isError}
+              </span>
+            )}
+            <button
+              disabled={isSubmitting}
+              type="button"
+              onClick={onSubmit}
+              className="btn_create_account mt-4"
+            >
+              {isSubmitting ? "Please wait..." : "Create account"}
             </button>
             <button
               type="button"

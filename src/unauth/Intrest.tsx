@@ -58,7 +58,7 @@ const Intrest = () => {
         });
         if (response.status == 200) {
           navigate("/stock");
-          toast.success("News topics saved successfully");
+          // toast.success("News topics saved successfully");
         }
       } catch (error: any) {
         console.error(error);

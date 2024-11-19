@@ -120,7 +120,13 @@ const News = () => {
                 getNews();
               }}
             >
-              Refresh
+              {" "}
+              {isLoading && (
+                <svg viewBox="25 25 50 50" className="ldrsvg2">
+                  <circle className="cir2" r="20" cy="50" cx="50"></circle>
+                </svg>
+              )}
+              &nbsp; Refresh
             </button>
             {/* <button className="btn_ref mr_10pxcls">Edit</button>
             <button className="btn_ref_xp mr_10pxcls">Explore</button> */}
@@ -209,8 +215,9 @@ const News = () => {
                   className="stockname2"
                   dangerouslySetInnerHTML={{
                     __html:
-                      item.description.length > 160
-                        ? item.description.slice(0, 160) + "..."
+                      item.description.length > 140
+                        ? item.description.replace("<br>", " ").slice(0, 140) +
+                          "..."
                         : item.description.split("\n").join("<br/>"),
                   }}
                 >

@@ -2,7 +2,7 @@ import { useState } from "react";
 import rocket from "../assets/rocket.svg";
 import { useNavigate } from "react-router-dom";
 import OTPInput from "react-otp-input";
-import { toast } from "react-toastify";
+
 import { postRequest } from "../services/axiosService";
 import useUserStore from "../zustand/userStore";
 import FullScreenLoader from "../components/FullScreenLoader";
@@ -14,10 +14,12 @@ const SetPassword = () => {
   const [otp, setOtp] = useState<any>("");
   const navigate = useNavigate();
   const [firstOTP, setfirstOTP] = useState(false);
+  const [isError, setisError] = useState("");
   const submit = async () => {
     if (firstOTP) {
       if (otp.length == 6) {
         if (otp == otp2) {
+          setisError("");
           try {
             setIsLoading(true);
             const response: any = await postRequest<{
@@ -31,7 +33,6 @@ const SetPassword = () => {
               otp: otp,
             });
             if (response.status === 200) {
-              // toast.success(response.data);
               setIsLoading(false);
               setOTP(otp);
               try {
@@ -44,7 +45,7 @@ const SetPassword = () => {
                   otp: otp,
                 });
                 if (response.status === 200) {
-                  toast.success(response.data);
+                  setisError(response.data);
                   setIsLoading(false);
                   setOTP(otp);
                   localStorage.setItem(
@@ -57,25 +58,26 @@ const SetPassword = () => {
               } catch (error: any) {
                 setIsLoading(false);
                 console.error("Error creating user:", error);
-                toast.error(error.response.data);
+                setisError(error.response.data);
               }
             }
           } catch (error: any) {
             setIsLoading(false);
             console.error("Error creating user:", error);
-            toast.error(error.response.data);
+            setisError(error.response.data);
           }
         } else {
-          toast.error("Password is mismatched.");
+          setisError("Password is mismatched.");
         }
       } else {
-        toast.error("Password is required.");
+        setisError("Password is required.");
       }
     } else {
       if (otp2.length == 6) {
+        setisError("");
         setfirstOTP(true);
       } else {
-        toast.error("Password is required.");
+        setisError("Password is required.");
       }
     }
   };
@@ -107,6 +109,17 @@ const SetPassword = () => {
                 numInputs={6}
                 renderInput={(props) => <input {...props} />}
               />
+            )}
+            {isError && (
+              <span
+                style={{
+                  color: "#fff",
+                  fontSize: "14px",
+                  marginTop: "10px",
+                }}
+              >
+                {isError}
+              </span>
             )}
             <div className="pt-5">
               <button

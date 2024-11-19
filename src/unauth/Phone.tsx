@@ -2,7 +2,7 @@ import rocket from "../assets/rocket.svg";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { postRequest } from "../services/axiosService";
-import { toast } from "react-toastify";
+
 import useUserStore from "../zustand/userStore";
 import FullScreenLoader from "../components/FullScreenLoader";
 import { useForm } from "react-hook-form";
@@ -12,6 +12,7 @@ const Phone = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const { setPhone } = useUserStore();
+  const [isError, setisError] = useState("");
   const formSchema = Yup.object().shape({
     phone: Yup.string()
       .required("Phone number is required")
@@ -22,16 +23,17 @@ const Phone = () => {
     resolver: yupResolver(formSchema),
   };
   const { register, handleSubmit, formState } = useForm(formOptions);
-  const { errors } = formState;
+  const { errors, isSubmitting } = formState;
   const submit = handleSubmit(async (data) => {
     try {
+      setisError("");
       setIsLoading(true);
       const response: any = await postRequest<{
         phone: string;
         otp: string;
       }>("/api/auth/signin", data);
       if (response.status === 200) {
-        toast.success(response.data);
+        setisError(response.data);
         setIsLoading(false);
         setPhone(data.phone);
         navigate("/enter-password", { replace: true });
@@ -39,7 +41,7 @@ const Phone = () => {
     } catch (error: any) {
       setIsLoading(false);
       console.error("Error creating user:", error);
-      toast.error(error.response.data);
+      setisError(error.response.data);
     }
   });
   const numberOnlyValidation = (event: any) => {
@@ -76,16 +78,28 @@ const Phone = () => {
               >
                 {errors.phone?.message?.toString()}
               </span>
+              {isError && (
+                <span
+                  style={{
+                    color: "#fff",
+                    fontSize: "14px",
+                    marginTop: "10px",
+                  }}
+                >
+                  {isError}
+                </span>
+              )}
             </div>
             <div className="pt-5">
               <button
                 type="button"
+                disabled={isSubmitting}
                 onClick={() => {
                   submit();
                 }}
                 className="btn_create_account mt-5 "
               >
-                Sign in
+                {isSubmitting ? "Please wait..." : "Sign in"}
               </button>
               <button
                 className="btn_sign_in"

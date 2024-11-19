@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import rocket from "../assets/rocket.svg";
 import OTPInput from "react-otp-input";
 import { useState } from "react";
-import { toast } from "react-toastify";
+
 import { postRequest } from "../services/axiosService";
 import useUserStore from "../zustand/userStore";
 import FullScreenLoader from "../components/FullScreenLoader";
@@ -12,9 +12,11 @@ const EnterPassword = () => {
   const navigate = useNavigate();
   const { phone, setOTP, setToken } = useUserStore();
   const [otp, setOtp] = useState<any>("");
+  const [isError, setisError] = useState("");
   const submit = async () => {
     if (otp.length == 6) {
       try {
+        setisError("");
         setIsLoading(true);
         const response: any = await postRequest<{
           phone: string;
@@ -24,7 +26,7 @@ const EnterPassword = () => {
           otp: otp,
         });
         if (response.status === 200) {
-          toast.success(response.data);
+          setisError(response.data);
           setIsLoading(false);
           setOTP(otp);
           localStorage.setItem("vestr", JSON.stringify(response.data.user));
@@ -34,10 +36,10 @@ const EnterPassword = () => {
       } catch (error: any) {
         setIsLoading(false);
         console.error("Error creating user:", error);
-        toast.error(error.response.data);
+        setisError(error.response.data);
       }
     } else {
-      toast.error("Password is required");
+      setisError("Password is required");
     }
   };
   return (
@@ -55,6 +57,17 @@ const EnterPassword = () => {
               numInputs={6}
               renderInput={(props) => <input {...props} />}
             />
+            {isError && (
+              <span
+                style={{
+                  color: "#fff",
+                  fontSize: "14px",
+                  marginTop: "10px",
+                }}
+              >
+                {isError}
+              </span>
+            )}
             <div className="pt-5">
               <button
                 type="button"

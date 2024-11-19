@@ -32,6 +32,7 @@ const MarketDetail = () => {
   const [IsModal, setIsModal] = useState(false);
   const [IsBut, setIsBut] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoading2, setIsLoading2] = useState(false);
   const [isStockDetails, setisStockDetails] = useState(1);
   const [ticker, setticker] = useState("");
   const [stockDetail, setstockDetail] = useState<any>("");
@@ -51,6 +52,7 @@ const MarketDetail = () => {
   const [totalSELL, settotalSELL] = useState(0);
   const navigate = useNavigate();
   const [cashBalance, setCashBalance] = useState<any>(null);
+  const [isError, setisError] = useState("");
 
   // const getRecentSearch = async () => {
   //   try {
@@ -307,7 +309,7 @@ const MarketDetail = () => {
   const buyStiock = async () => {
     if (quantity) {
       try {
-        setIsLoading(true);
+        setIsLoading2(true);
         if (IsBut) {
           const response = await postRequest<any>("/api/stockActions/buy", {
             ticker: ticker,
@@ -315,7 +317,7 @@ const MarketDetail = () => {
             price: currentPrice2,
             quantity: quantity,
           });
-          setIsLoading(false);
+
           // console.log(response.data);
 
           toast.success(response.data.message);
@@ -325,9 +327,12 @@ const MarketDetail = () => {
           getStockBUYSELL();
           fetchUserCashBalance(setCashBalance);
           fetchUserPortfolio(setUserPortfolio);
+          setTimeout(() => {
+            setIsLoading2(false);
+          }, 3000);
         } else {
           if (Number(quantity) > totalBUY) {
-            toast.error("You don't have enough stock to sell");
+            setisError("You don't have enough stock to sell");
           } else {
             setIsLoading(true);
             const response = await postRequest<any>("/api/stockActions/sell", {
@@ -336,7 +341,7 @@ const MarketDetail = () => {
               price: currentPrice2,
               quantity: quantity,
             });
-            setIsLoading(false);
+
             setIsModal(false);
             toast.success(response.data.message);
             setisStockDetails(2);
@@ -344,17 +349,21 @@ const MarketDetail = () => {
             getStockBUYSELL();
             fetchUserCashBalance(setCashBalance);
             fetchUserPortfolio(setUserPortfolio);
+            setTimeout(() => {
+              setIsLoading2(false);
+            }, 3000);
           }
         }
       } catch (error: any) {
-        setIsLoading(false);
+        setTimeout(() => {
+          setIsLoading2(false);
+        }, 3000);
         console.error("Error creating user:", error);
         // toast.error(error.response.data.message);
         setbalanceMSG(error.response.data.message);
         setisInsufficient(true);
         setIsModal(false);
       } finally {
-        setIsLoading(false);
         setisConfirm(false);
       }
     } else {
@@ -885,7 +894,7 @@ const MarketDetail = () => {
             <div className="row mt-5">
               <div className="col-12">
                 <p className="parane7 ">
-                  News about {stockDetail?.name} ({ticker})
+                  News about {stockDetail?.name} (${ticker})
                 </p>
               </div>
               <div className="col-12 pt-2 pb-2">
@@ -935,6 +944,7 @@ const MarketDetail = () => {
                 <button
                   className="back-btn mb-2"
                   onClick={() => {
+                    setisError("");
                     if (isConfirm) {
                       setisConfirm(false);
                     } else {
@@ -980,7 +990,15 @@ const MarketDetail = () => {
                 {!isConfirm && (
                   <CurrencyInput
                     value={quantity}
-                    onChange={setquantity}
+                    onChange={(e) => {
+                      if (e) {
+                        setquantity(e);
+                        setisError("");
+                      } else {
+                        setquantity("");
+                        setisError("Please enter valid quantity");
+                      }
+                    }}
                     prefix=""
                     className="shares_qty"
                     placeholder="0"
@@ -1028,6 +1046,13 @@ const MarketDetail = () => {
                 </p>
               </div>
             </div>
+            {isError && (
+              <div className="row  pb-3 pt-3">
+                <div className="col-12 px-3 pt-1" style={{ color: "#fff" }}>
+                  {isError}
+                </div>
+              </div>
+            )}
             {IsBut && (
               <div className="row">
                 <div className="col-12 mt-5 balance-show">
@@ -1040,11 +1065,11 @@ const MarketDetail = () => {
                 {!isConfirm && (
                   <button
                     onClick={() => {
-                      if (quantity > 0) {
-                        // setIsModal(true);
+                      if (quantity && quantity > 0) {
+                        setisError("");
                         setisConfirm(true);
                       } else {
-                        // toast.error("Please enter valid quantity");
+                        setisError("Please enter valid quantity");
                       }
                     }}
                     className="buy_shares_btn"
@@ -1052,12 +1077,16 @@ const MarketDetail = () => {
                     {IsBut ? "Buy" : "Sell"}
                   </button>
                 )}
-                {isConfirm && (
+                {isConfirm && !isLoading2 && (
                   <button
-                    disabled={isLoading}
                     className="buy_shares_btn confirm_cash2"
                     onClick={() => buyStiock()}
                   >
+                    Confirm
+                  </button>
+                )}
+                {isConfirm && isLoading2 && (
+                  <button className="buy_shares_btn confirm_cash2">
                     Confirm
                   </button>
                 )}

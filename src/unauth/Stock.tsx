@@ -50,7 +50,7 @@ const Stock = () => {
         });
         if (response.status == 200) {
           // navigate("/enter-password", { replace: true });
-          toast.success("Stocks saved successfully");
+          // toast.success("Stocks saved successfully");
           window.location.reload();
         }
       } catch (error: any) {

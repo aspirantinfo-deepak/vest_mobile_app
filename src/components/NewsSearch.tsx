@@ -268,7 +268,15 @@ const NewsSearch = (props: any) => {
               }
               onClick={searchNews}
             >
-              Search
+              {isLoading && (
+                <>
+                  <svg viewBox="25 25 50 50" className="ldrsvg">
+                    <circle className="cir" r="20" cy="50" cx="50"></circle>
+                  </svg>
+                  &nbsp; Searching...
+                </>
+              )}
+              {!isLoading && "Search"}
             </button>
           )}
           {showSearchButton && isSaved && (
@@ -382,7 +390,8 @@ const NewsSearch = (props: any) => {
                   dangerouslySetInnerHTML={{
                     __html:
                       item.description.length > 80
-                        ? item.description.slice(0, 80) + "..."
+                        ? item.description.replace("<br>", " ").slice(0, 80) +
+                          "..."
                         : item.description.split("\n").join("<br/>"),
                   }}
                 ></p>
