@@ -263,6 +263,7 @@ const NewsSearch = (props: any) => {
           {!showSearchButton && (
             <button
               className="refreshnwsfed"
+              disabled={isLoading}
               style={
                 keyword ? { backgroundColor: "#00FF00", color: "black" } : {}
               }

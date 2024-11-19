@@ -14,6 +14,8 @@ import {
   fetchUserCashBalance,
   fetchUserPortfolio,
   formatCurrency as fc,
+  getUnixTimestampRange,
+  portfolioIntervalMap,
 } from "../helper/MarketHelper";
 import CurrencyInput from "../components/CurrencyInput";
 
@@ -32,7 +34,6 @@ const MarketDetail = () => {
   const [IsModal, setIsModal] = useState(false);
   const [IsBut, setIsBut] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  const [isLoading2, setIsLoading2] = useState(false);
   const [isStockDetails, setisStockDetails] = useState(1);
   const [ticker, setticker] = useState("");
   const [stockDetail, setstockDetail] = useState<any>("");
@@ -200,67 +201,29 @@ const MarketDetail = () => {
   };
   const getStockGraph = async () => {
     try {
-      const timeValues: { [key: string]: any } = {
-        live: {
-          from: (date: Date) =>
-            date.setTime(date.getTime() - 1000 * 60 * 5) && date,
-          multiplier: 1,
-          timespan: "second",
-        },
-        "1h": {
-          from: (date: Date) =>
-            date.setTime(date.getTime() - 1000 * 60 * 60) && date,
-          multiplier: 14,
-          timespan: "second",
-        },
-        "1d": {
-          from: (date: Date) => date.setDate(date.getDate() - 1) && date,
-          multiplier: 1,
-          timespan: "minute",
-        },
-        "1w": {
-          from: (date: Date) => date.setDate(date.getDate() - 7) && date,
-          multiplier: 15,
-          timespan: "minute",
-        },
-        "3m": {
-          from: (date: Date) => date.setMonth(date.getMonth() - 3) && date,
-          multiplier: 1,
-          timespan: "day",
-        },
-        "1y": {
-          from: (date: Date) =>
-            date.setFullYear(date.getFullYear() - 1) && date,
-          multiplier: 1,
-          timespan: "day",
-        },
-        all: {
-          from: () => new Date("August 01, 2003"),
-          multiplier: 1,
-          timespan: "week",
-        },
-      };
-      const currentDate = new Date();
-      const oldDate = timeValues[interval].from(new Date(currentDate));
+      let fromDateUnixMs;
+      let toDateUnixMs = new Date().getTime();
 
-      // setIsLoading(true);
-      const url =
-        "/api/markets/stock/datapoints?" +
-        "ticker=" +
-        ticker +
-        "&" +
-        "fromDateUnixMs=" +
-        oldDate.getTime() +
-        "&" +
-        "toDateUnixMs=" +
-        currentDate.getTime() +
-        "&" +
-        "multiplier=" +
-        timeValues[interval].multiplier +
-        "&" +
-        "timespan=" +
-        timeValues[interval].timespan;
-      const response = await getRequest<any>(url);
+      if (interval === "all time") {
+        fromDateUnixMs = new Date("2024-08-01").getTime();
+      } else {
+        fromDateUnixMs = getUnixTimestampRange(interval);
+      }
+
+      const [multiplier, timespan] = portfolioIntervalMap[interval  as keyof typeof portfolioIntervalMap];
+      
+      const response: any = await getRequest(
+        "/api/markets/stock/datapoints",
+        {
+          params: {
+            ticker,
+            multiplier,
+            timespan,
+            fromDateUnixMs,
+            toDateUnixMs,
+          },
+        }
+      );
       setIsLoading(false);
       setsampleData([]);
       if (response.status == 200) {
@@ -270,7 +233,7 @@ const MarketDetail = () => {
         for (var i = 0; i < response.data.length; i++) {
           demosampleData.push({
             y: response.data[i].c,
-            x: response.data[i].t,
+            x: i,
             t: response.data[i].t,
           });
         }
@@ -309,7 +272,7 @@ const MarketDetail = () => {
   const buyStiock = async () => {
     if (quantity) {
       try {
-        setIsLoading2(true);
+        setIsLoading(true);
         if (IsBut) {
           const response = await postRequest<any>("/api/stockActions/buy", {
             ticker: ticker,
@@ -328,7 +291,7 @@ const MarketDetail = () => {
           fetchUserCashBalance(setCashBalance);
           fetchUserPortfolio(setUserPortfolio);
           setTimeout(() => {
-            setIsLoading2(false);
+            setIsLoading(false);
           }, 3000);
         } else {
           if (Number(quantity) > totalBUY) {
@@ -350,13 +313,13 @@ const MarketDetail = () => {
             fetchUserCashBalance(setCashBalance);
             fetchUserPortfolio(setUserPortfolio);
             setTimeout(() => {
-              setIsLoading2(false);
+              setIsLoading(false);
             }, 3000);
           }
         }
       } catch (error: any) {
         setTimeout(() => {
-          setIsLoading2(false);
+          setIsLoading(false);
         }, 3000);
         console.error("Error creating user:", error);
         // toast.error(error.response.data.message);
@@ -1077,16 +1040,12 @@ const MarketDetail = () => {
                     {IsBut ? "Buy" : "Sell"}
                   </button>
                 )}
-                {isConfirm && !isLoading2 && (
+                {isConfirm && (
                   <button
+                    disabled={isLoading}
                     className="buy_shares_btn confirm_cash2"
                     onClick={() => buyStiock()}
                   >
-                    Confirm
-                  </button>
-                )}
-                {isConfirm && isLoading2 && (
-                  <button className="buy_shares_btn confirm_cash2">
                     Confirm
                   </button>
                 )}

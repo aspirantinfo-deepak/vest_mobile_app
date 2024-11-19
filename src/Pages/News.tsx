@@ -115,6 +115,7 @@ const News = () => {
         <div className="row">
           <div className="col-12 pt-1">
             <button
+              disabled={isLoading}
               className="btn_ref mr_10pxcls"
               onClick={() => {
                 getNews();

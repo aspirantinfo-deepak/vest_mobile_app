@@ -102,7 +102,7 @@ const StockGraph: React.FC<LineChartProps> = ({
       formatter: function (this: any): any {
         setcurrentPrice(this.y);
         const xValue = this.x;
-        // const tValue = this.t;
+        const tValue = this.point.t;
         this.points![0].series.chart.xAxis[0].addPlotLine({
           value: Number(xValue), // Convert xValue to a number
           color: "gray",
@@ -111,7 +111,7 @@ const StockGraph: React.FC<LineChartProps> = ({
           zIndex: 5,
         });
         this.points![0].series.chart.yAxis[0].removePlotLine();
-        return `${dayjs(xValue).format("MMM DD, YYYY h:mm A")}`;
+        return `${dayjs(tValue).format("MMM DD, YYYY h:mm A")}`;
       },
     },
   };
