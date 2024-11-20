@@ -262,8 +262,8 @@ const NewsSearch = (props: any) => {
           {/* showSearchButton */}
           {!showSearchButton && (
             <button
-              className="refreshnwsfed"
               disabled={isLoading}
+              className="refreshnwsfed"
               style={
                 keyword ? { backgroundColor: "#00FF00", color: "black" } : {}
               }

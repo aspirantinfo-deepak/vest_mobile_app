@@ -26,7 +26,7 @@ const EnterPassword = () => {
           otp: otp,
         });
         if (response.status === 200) {
-          setisError(response.data);
+          setisError("");
           setIsLoading(false);
           setOTP(otp);
           localStorage.setItem("vestr", JSON.stringify(response.data.user));

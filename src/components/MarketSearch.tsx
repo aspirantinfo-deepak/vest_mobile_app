@@ -14,8 +14,6 @@ import {
   fetchUserCashBalance,
   fetchUserPortfolio,
   formatCurrency as fc,
-  getUnixTimestampRange,
-  portfolioIntervalMap,
 } from "../helper/MarketHelper";
 import CurrencyInput from "./CurrencyInput";
 const MarketSearch = (props: any) => {
@@ -36,6 +34,7 @@ const MarketSearch = (props: any) => {
   const [IsBut, setIsBut] = useState(true);
   const [keyword, setkeyword] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoading2, setIsLoading2] = useState(false);
   const [stockList, setstockList] = useState<any>([]);
   const [isStockDetails, setisStockDetails] = useState(1);
   const [ticker, setticker] = useState("");
@@ -134,17 +133,18 @@ const MarketSearch = (props: any) => {
           keyword: keyword,
           type: type,
         });
-        setIsLoading(false);
+
         if (response.status == 200) {
           // console.log(response.data);
           setstockList(response.data.data.result);
+          setIsLoading(false);
         }
       } catch (error: any) {
         setIsLoading(false);
         console.error("Error creating user:", error);
       }
     } else {
-      toast.error("Please enter stock");
+      // toast.error("Please enter stock");
     }
   };
   useEffect(() => {
@@ -213,12 +213,12 @@ const MarketSearch = (props: any) => {
         "/api/stockActions/transactions/" + ticker
       );
       setIsLoading(false);
-      console.log(response.data);
+      // console.log(response.data);
       var demoBUY = 0;
       var demoSELL = 0;
       for (let index = 0; index < response.data.length; index++) {
         if (response.data[index].type == "buy") {
-          console.log(response.data[index]);
+          // console.log(response.data[index]);
           demoBUY += response.data[index].quantity;
         } else {
           demoSELL += response.data[index].quantity;
@@ -255,29 +255,67 @@ const MarketSearch = (props: any) => {
   };
   const getStockGraph = async () => {
     try {
-      let fromDateUnixMs;
-      let toDateUnixMs = new Date().getTime();
+      const timeValues: { [key: string]: any } = {
+        live: {
+          from: (date: Date) =>
+            date.setTime(date.getTime() - 1000 * 60 * 5) && date,
+          multiplier: 1,
+          timespan: "second",
+        },
+        "1h": {
+          from: (date: Date) =>
+            date.setTime(date.getTime() - 1000 * 60 * 60) && date,
+          multiplier: 14,
+          timespan: "second",
+        },
+        "1d": {
+          from: (date: Date) => date.setDate(date.getDate() - 1) && date,
+          multiplier: 1,
+          timespan: "minute",
+        },
+        "1w": {
+          from: (date: Date) => date.setDate(date.getDate() - 7) && date,
+          multiplier: 15,
+          timespan: "minute",
+        },
+        "3m": {
+          from: (date: Date) => date.setMonth(date.getMonth() - 3) && date,
+          multiplier: 1,
+          timespan: "day",
+        },
+        "1y": {
+          from: (date: Date) =>
+            date.setFullYear(date.getFullYear() - 1) && date,
+          multiplier: 1,
+          timespan: "day",
+        },
+        all: {
+          from: () => new Date("August 01, 2003"),
+          multiplier: 1,
+          timespan: "week",
+        },
+      };
+      const currentDate = new Date();
+      const oldDate = timeValues[interval].from(new Date(currentDate));
 
-      if (interval === "all time") {
-        fromDateUnixMs = new Date("2024-08-01").getTime();
-      } else {
-        fromDateUnixMs = getUnixTimestampRange(interval);
-      }
-
-      const [multiplier, timespan] = portfolioIntervalMap[interval  as keyof typeof portfolioIntervalMap];
-      
-      const response: any = await getRequest(
-        "/api/markets/stock/datapoints",
-        {
-          params: {
-            ticker,
-            multiplier,
-            timespan,
-            fromDateUnixMs,
-            toDateUnixMs,
-          },
-        }
-      );
+      // setIsLoading(true);
+      const url =
+        "/api/markets/stock/datapoints?" +
+        "ticker=" +
+        ticker +
+        "&" +
+        "fromDateUnixMs=" +
+        oldDate.getTime() +
+        "&" +
+        "toDateUnixMs=" +
+        currentDate.getTime() +
+        "&" +
+        "multiplier=" +
+        timeValues[interval].multiplier +
+        "&" +
+        "timespan=" +
+        timeValues[interval].timespan;
+      const response = await getRequest<any>(url);
       setIsLoading(false);
       setsampleData([]);
       if (response.status == 200) {
@@ -326,8 +364,9 @@ const MarketSearch = (props: any) => {
   const buyStiock = async () => {
     if (quantity) {
       try {
-        setIsLoading(true);
         if (IsBut) {
+          if (isLoading2) return;
+          setIsLoading2(true);
           const response = await postRequest<any>("/api/stockActions/buy", {
             ticker: ticker,
             assetType: type,
@@ -344,14 +383,15 @@ const MarketSearch = (props: any) => {
           getStockBUYSELL();
           fetchUserCashBalance(setCashBalance);
           fetchUserPortfolio(setUserPortfolio);
-          setTimeout(() => {
-            setIsLoading(false);
-          }, 3000);
+          // setTimeout(() => {
+          setIsLoading2(false);
+          // }, 3000);
         } else {
           if (Number(quantity) > totalBUY) {
-            toast.error("You don't have enough stock to sell");
+            toast.error("You don't have enough shares to sell");
           } else {
-            setIsLoading(true);
+            if (isLoading2) return;
+            setIsLoading2(true);
             const response = await postRequest<any>("/api/stockActions/sell", {
               ticker: ticker,
               assetType: type,
@@ -366,15 +406,15 @@ const MarketSearch = (props: any) => {
             getStockBUYSELL();
             fetchUserCashBalance(setCashBalance);
             fetchUserPortfolio(setUserPortfolio);
-            setTimeout(() => {
-              setIsLoading(false);
-            }, 3000);
+            // setTimeout(() => {
+            setIsLoading2(false);
+            // }, 3000);
           }
         }
       } catch (error: any) {
-        setTimeout(() => {
-          setIsLoading(false);
-        }, 3000);
+        // setTimeout(() => {
+        setIsLoading2(false);
+        // }, 3000);
         console.error("Error creating user:", error);
         // toast.error(error.response.data.message);
         setbalanceMSG(error.response.data.message);
@@ -583,24 +623,31 @@ const MarketSearch = (props: any) => {
           </div>
           <div className="row pt-4">
             <div className="col-12">
-              <button
-                className="refreshnwsfed"
-                disabled={isLoading}
-                style={
-                  keyword ? { backgroundColor: "#00FF00", color: "black" } : {}
-                }
-                onClick={searchStock}
-              >
-                {isLoading && (
-                <>
-                  <svg viewBox="25 25 50 50" className="ldrsvg">
-                    <circle className="cir" r="20" cy="50" cx="50"></circle>
-                  </svg>
-                  &nbsp; Searching...
-                </>
+              {!isLoading && (
+                <button
+                  className="refreshnwsfed"
+                  style={
+                    keyword
+                      ? { backgroundColor: "#00FF00", color: "black" }
+                      : {}
+                  }
+                  onClick={searchStock}
+                >
+                  Search
+                </button>
               )}
-              {!isLoading && "Search"}
-              </button>
+              {isLoading && (
+                <button
+                  className="refreshnwsfed"
+                  style={
+                    keyword
+                      ? { backgroundColor: "#00FF00", color: "black" }
+                      : {}
+                  }
+                >
+                  Searching...
+                </button>
+              )}
             </div>
           </div>
           {stockList.length > 0 && (
@@ -904,7 +951,7 @@ const MarketSearch = (props: any) => {
                   <p className="para6">
                     {userTickerPosition?.quantity &&
                       formatCurrency2(
-                        userTickerPosition?.quantity * currentPrice
+                        userTickerPosition?.quantity * currentPrice2
                       )}
                     {!userTickerPosition?.quantity && "--"}
                   </p>
@@ -1155,7 +1202,8 @@ const MarketSearch = (props: any) => {
                 {IsBut ? "Buy" : "Sell"} {ticker}
               </p>
               <p>
-                You currently own {totalBUY - totalSELL} shares of {ticker}
+                You currently own {formatCurrency3(totalBUY - totalSELL)} shares
+                of {ticker}
               </p>
             </div>
           </div>
@@ -1247,13 +1295,18 @@ const MarketSearch = (props: any) => {
               )}
               {isConfirm && (
                 <button
-                  disabled={isLoading}
+                  disabled={isLoading2}
                   className="buy_shares_btn confirm_cash2"
                   onClick={() => buyStiock()}
                 >
                   Confirm
                 </button>
               )}
+              {/* {isConfirm && isLoading2 && (
+                <button className="buy_shares_btn confirm_cash2">
+                  Confirm
+                </button>
+              )} */}
             </div>
           </div>
         </div>

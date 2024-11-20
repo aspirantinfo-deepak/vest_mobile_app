@@ -218,9 +218,9 @@ const Portfolio = () => {
       // var demoCategories = [];
       for (var i = 0; i < response.data.length; i++) {
         demosampleData.push({
-          t: response.data[i].time,
           y: response.data[i].portfolioValue,
           x: i,
+          t: response.data[i].time,
         });
         // demoCategories.push(response.data[i].time);
       }

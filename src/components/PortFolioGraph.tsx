@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
+import { useEffect, useRef } from "react";
 
 interface LineChartProps {
   data: [];
@@ -14,6 +15,25 @@ const PortFolioGraph: React.FC<LineChartProps> = ({
   currentPrice,
   previousPrice,
 }) => {
+  const chartRef = useRef<any>(null);
+  useEffect(() => {
+    const chart = chartRef.current?.chart;
+
+    const handleTouchStart = (e: any) => {
+      console.log("Touch started", e.touches[0]);
+    };
+
+    const handleTouchEnd = (e: any) => {
+      console.log("Touch ended", e);
+      chart.xAxis[0].removePlotLine();
+      chart.tooltip.hide();
+    };
+
+    if (chart) {
+      Highcharts.addEvent(chart.container, "touchstart", handleTouchStart);
+      Highcharts.addEvent(chart.container, "touchend", handleTouchEnd);
+    }
+  }, []);
   const chartOptions = {
     plotOptions: {
       series: {
@@ -21,14 +41,7 @@ const PortFolioGraph: React.FC<LineChartProps> = ({
           events: {
             mouseOut: (e: any) => {
               e.target.series.chart.xAxis[0].removePlotLine();
-              // previousPrice &&
-              //   e.target.series.chart.yAxis[0].addPlotLine({
-              //     value: previousPrice,
-              //     color: "gray",
-              //     dashStyle: "Dot",
-              //     width: 1,
-              //     zIndex: 5,
-              //   });
+
               setcurrentPrice(currentPrice);
             },
           },
@@ -43,10 +56,10 @@ const PortFolioGraph: React.FC<LineChartProps> = ({
       text: "",
     },
     xAxis: {
-      visible: true, // Hides the x-axis
+      visible: true,
       plotLines: [],
       labels: {
-        enabled: false, // This hides only the x-axis labels
+        enabled: false,
       },
     },
     yAxis: {
@@ -60,27 +73,27 @@ const PortFolioGraph: React.FC<LineChartProps> = ({
         },
       ],
 
-      visible: true, // Hides the y-axis
+      visible: true,
       labels: {
-        enabled: false, // This hides only the y-axis labels
+        enabled: false,
       },
       title: {
-        text: null, // Hides the y-axis title
+        text: null,
       },
       gridLineWidth: 0,
     },
     legend: {
-      enabled: false, // Hides the legend
+      enabled: false,
     },
     credits: {
-      enabled: false, // Hides the Highcharts credit text
+      enabled: false,
     },
     series: [
       {
         data: data,
         color: "#00FF00",
         marker: {
-          enabled: false, // Disable the dots
+          enabled: false,
         },
       },
     ],
@@ -88,7 +101,7 @@ const PortFolioGraph: React.FC<LineChartProps> = ({
       shared: true,
       backgroundColor: "black",
       style: {
-        color: "#ffffff", // Change text color in the tooltip
+        color: "#ffffff",
       },
       positioner: (_: any, __: any, point: any) => {
         var tooltipX = point.plotX - 60;
@@ -116,7 +129,13 @@ const PortFolioGraph: React.FC<LineChartProps> = ({
     },
   };
 
-  return <HighchartsReact highcharts={Highcharts} options={chartOptions} />;
+  return (
+    <HighchartsReact
+      highcharts={Highcharts}
+      options={chartOptions}
+      ref={chartRef}
+    />
+  );
 };
 
 export default PortFolioGraph;

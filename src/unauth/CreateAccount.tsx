@@ -89,6 +89,17 @@ const CreateAccount = () => {
           <FullScreenLoader isLoading={isLoading} message="Please wait..." />
           <h2 className="shadowtext mt-5  mb-4">Moon</h2>
           <form autoComplete="off">
+            {isError && (
+              <span
+                style={{
+                  color: "#fff",
+                  fontSize: "14px",
+                  marginTop: "10px",
+                }}
+              >
+                {isError}
+              </span>
+            )}
             <input
               autoComplete="off"
               type="text"
@@ -170,17 +181,7 @@ const CreateAccount = () => {
             >
               {errors.phone?.message}
             </span>
-            {isError && (
-              <span
-                style={{
-                  color: "#fff",
-                  fontSize: "14px",
-                  marginTop: "10px",
-                }}
-              >
-                {isError}
-              </span>
-            )}
+
             <button
               disabled={isSubmitting}
               type="button"
