@@ -202,7 +202,7 @@ const Portfolio = () => {
 
       multiplier = intervalArray[0];
       timespan = intervalArray[1];
-
+      // setsampleData([]);
       const response: any = await getRequest(
         "/api/markets/portfolio/datapoints",
         {
@@ -215,6 +215,7 @@ const Portfolio = () => {
         }
       );
       var demosampleData = [];
+
       // var demoCategories = [];
       for (var i = 0; i < response.data.length; i++) {
         demosampleData.push({

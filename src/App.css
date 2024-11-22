@@ -18,7 +18,10 @@ html,
 body {
   background-color: #030902 !important;
 }
-
+.highcharts-container {
+  touch-action: none; /* Prevent browser zoom/pan gestures */
+  user-select: none; /* Disable text selection */
+}
 .headspace {
   background-color: transparent !important;
   height: 100vh;
