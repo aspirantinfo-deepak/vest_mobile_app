@@ -79,7 +79,7 @@ const AddCash = () => {
           <div className="col-12 addcashpaghead">
             <h1>Add cash</h1>
             <p className="pt-2">
-              You currently have {formatCurrency(totalCash)} in cash
+              You currently have {formatCurrency(totalCash) || 0} in cash
             </p>
           </div>
           <div className="col-12 py-5">

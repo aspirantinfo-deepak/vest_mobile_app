@@ -40,6 +40,7 @@ const StockGraph: React.FC<LineChartProps> = ({
           point.setState(""); // Reset marker state
         });
       });
+      setcurrentPrice(currentPrice);
     };
 
     if (chart) {
@@ -107,6 +108,7 @@ const StockGraph: React.FC<LineChartProps> = ({
           {
             data: data,
             color: "#00FF00",
+            lineWidth: 1,
             marker: {
               enabled: false,
             },

@@ -2,7 +2,6 @@ import rocket from "../assets/rocket.svg";
 import { useEffect, useState } from "react";
 import { getRequest, postRequest } from "../services/axiosService";
 import useUserStore from "../zustand/userStore";
-import { toast } from "react-toastify";
 
 const Stock = () => {
   const [news, setnews] = useState<any>([]);
@@ -55,7 +54,7 @@ const Stock = () => {
         }
       } catch (error: any) {
         console.error(error);
-        toast.error(error.response.data);
+        setIsModal(true);
       } finally {
         setisLoad(false);
       }

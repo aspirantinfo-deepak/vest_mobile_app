@@ -39,6 +39,7 @@ const PortFolioGraph: React.FC<LineChartProps> = ({
           point.setState(""); // Reset marker state
         });
       });
+      setcurrentPrice(currentPrice);
       setTimeout(() => {
         localStorage.removeItem("stayPortfolio");
       }, 2000);
@@ -115,6 +116,7 @@ const PortFolioGraph: React.FC<LineChartProps> = ({
           {
             data: data,
             color: "#00FF00",
+            lineWidth: 1,
             marker: {
               enabled: false,
             },

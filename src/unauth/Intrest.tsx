@@ -3,7 +3,6 @@ import rocket from "../assets/rocket.svg";
 import { useNavigate } from "react-router-dom";
 import { getRequest, postRequest } from "../services/axiosService";
 import useUserStore from "../zustand/userStore";
-import { toast } from "react-toastify";
 
 const Intrest = () => {
   const navigate = useNavigate();
@@ -62,7 +61,7 @@ const Intrest = () => {
         }
       } catch (error: any) {
         console.error(error);
-        toast.error(error.response.data);
+        setIsModal(true);
       } finally {
         setisLoad(false);
       }
