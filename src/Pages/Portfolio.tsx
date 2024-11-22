@@ -26,6 +26,7 @@ import MarketSearch from "../components/MarketSearch";
 
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+import { useTouchNavigate } from "../helper/TouchNavigate";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -622,9 +623,12 @@ const Portfolio = () => {
     return { backgroundColor, border };
   };
 
+  const touch = useTouchNavigate({right: () => navigate("/market")})
+  const touchSheet = useTouchNavigate({left : () => setOpen(false) })
+
   return (
     <>
-      <div className="container pt-3 pb-5 mb-5 ">
+      <div className="container pt-3 pb-5 mb-5 " {...touch}>
         <FullScreenLoader isLoading={isLoading} message="Please wait..." />
         <div className="row pt-3">
           <div className="col-9">
@@ -1993,7 +1997,7 @@ const Portfolio = () => {
           <Sheet.Header style={{ background: "#000" }} />
           <Sheet.Content style={{ background: "#000" }}>
             <Sheet.Scroller draggableAt="both">
-              <MarketSearch />
+              <MarketSearch touch={touchSheet}/>
             </Sheet.Scroller>
           </Sheet.Content>
         </Sheet.Container>

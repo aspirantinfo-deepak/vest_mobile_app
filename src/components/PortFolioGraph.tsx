@@ -25,28 +25,30 @@ const PortFolioGraph: React.FC<LineChartProps> = ({
 
     const handleTouchEnd = (e: any) => {
       console.log("Touch ended", e);
-      chart.xAxis[0].removePlotLine();
-      chart.tooltip.hide();
-      chart.yAxis[0].addPlotLine({
-        value: previousPrice,
-        color: "gray",
-        dashStyle: "Dot",
-        width: 1,
-        zIndex: 5,
-      });
-      chart.series.forEach((series: any) => {
-        series.points.forEach((point: any) => {
-          point.setState(""); // Reset marker state
-        });
-      });
-      setcurrentPrice(currentPrice);
       setTimeout(() => {
-        localStorage.removeItem("stayPortfolio");
+        chart.xAxis[0].removePlotLine();
+        chart.tooltip.hide();
+        chart.yAxis[0].addPlotLine({
+          value: previousPrice,
+          color: "gray",
+          dashStyle: "Dot",
+          width: 1,
+          zIndex: 5,
+        });
+        chart.series.forEach((series: any) => {
+          series.points.forEach((point: any) => {
+            point.setState(""); // Reset marker state
+          });
+        });
+        setcurrentPrice(currentPrice);
+      })
+      setTimeout(() => {
+        localStorage.removeItem("unsetTouchNavigator");
       }, 2000);
     };
     const handleTouchMove = (e: any) => {
       console.log("Touch move", e);
-      localStorage.setItem("stayPortfolio", "1");
+      localStorage.setItem("unsetTouchNavigator", "1");
     };
 
     if (chart) {
@@ -54,7 +56,7 @@ const PortFolioGraph: React.FC<LineChartProps> = ({
       Highcharts.addEvent(chart.container, "touchend", handleTouchEnd);
       Highcharts.addEvent(chart.container, "touchmove", handleTouchMove);
     }
-  }, []);
+  }, [currentPrice]);
   const [options, setoptions] = useState<any>({});
   useEffect(() => {
     if (data.length > 0) {
@@ -154,7 +156,7 @@ const PortFolioGraph: React.FC<LineChartProps> = ({
         },
       });
     }
-  }, [data]);
+  }, [data, currentPrice]);
 
   const chartCallback: Highcharts.ChartCallbackFunction = function (
     chart

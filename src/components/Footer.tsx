@@ -6,6 +6,7 @@ import { Sheet } from "react-modal-sheet";
 import { useEffect, useState } from "react";
 import MarketSearch from "./MarketSearch";
 import NewsSearch from "./NewsSearch";
+import { useTouchNavigate } from "../helper/TouchNavigate";
 // import PortfolioSearch from "./PortfolioSearch";
 const Footer = () => {
   const [isOpen, setOpen] = useState(false);
@@ -16,6 +17,7 @@ const Footer = () => {
       localStorage.setItem("isAPI", JSON.stringify(true));
     }
   }, [isOpen]);
+  const touchSheet = useTouchNavigate({left : () => setOpen(false)})
   return (
     <footer>
       <button className="searchmarketbtn" onClick={() => setOpen(true)}>
@@ -76,13 +78,13 @@ const Footer = () => {
           <Sheet.Content style={{ background: "#000" }}>
             <Sheet.Scroller draggableAt="both">
               {(location.pathname == "/news" || location.pathname == "/") && (
-                <NewsSearch />
+                <NewsSearch touch={touchSheet} />
               )}
               {(location.pathname == "/market" ||
                 location.pathname == "/marketdetail" ||
                 location.pathname == "/addcash" ||
-                location.pathname == "/addcashsuccess") && <MarketSearch />}
-              {location.pathname == "/portfolio" && <MarketSearch />}
+                location.pathname == "/addcashsuccess") && <MarketSearch touch={touchSheet} />}
+              {location.pathname == "/portfolio" && <MarketSearch touch={touchSheet} />}
             </Sheet.Scroller>
           </Sheet.Content>
         </Sheet.Container>

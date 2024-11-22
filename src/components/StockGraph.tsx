@@ -26,28 +26,38 @@ const StockGraph: React.FC<LineChartProps> = ({
 
     const handleTouchEnd = (e: any) => {
       console.log("Touch ended", e);
-      chart.xAxis[0].removePlotLine();
-      chart.tooltip.hide();
-      chart.yAxis[0].addPlotLine({
-        value: previousPrice,
-        color: "gray",
-        dashStyle: "Dot",
-        width: 1,
-        zIndex: 5,
-      });
-      chart.series.forEach((series: any) => {
-        series.points.forEach((point: any) => {
-          point.setState(""); // Reset marker state
+      setTimeout(() => {
+        chart.xAxis[0].removePlotLine();
+        chart.tooltip.hide();
+        chart.yAxis[0].addPlotLine({
+          value: previousPrice,
+          color: "gray",
+          dashStyle: "Dot",
+          width: 1,
+          zIndex: 5,
         });
-      });
-      setcurrentPrice(currentPrice);
+        chart.series.forEach((series: any) => {
+          series.points.forEach((point: any) => {
+            point.setState(""); // Reset marker state
+          });
+        });
+        setcurrentPrice(currentPrice);
+      })
+      setTimeout(() => {
+        localStorage.removeItem("unsetTouchNavigator");
+      }, 2000);
+    };
+    const handleTouchMove = (e: any) => {
+      console.log("Touch move", e);
+      localStorage.setItem("unsetTouchNavigator", "1");
     };
 
     if (chart) {
       Highcharts.addEvent(chart.container, "touchstart", handleTouchStart);
+      Highcharts.addEvent(chart.container, "touchmove", handleTouchMove);
       Highcharts.addEvent(chart.container, "touchend", handleTouchEnd);
     }
-  }, []);
+  }, [currentPrice]);
   const [options, setoptions] = useState({});
   useEffect(() => {
     if (data.length > 0) {
@@ -146,7 +156,7 @@ const StockGraph: React.FC<LineChartProps> = ({
         },
       });
     }
-  }, [data]);
+  }, [data, currentPrice]);
 
   return (
     <HighchartsReact highcharts={Highcharts} ref={chartRef} options={options} />

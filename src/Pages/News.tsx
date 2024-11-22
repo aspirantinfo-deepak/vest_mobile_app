@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import NewsSearch from "../components/NewsSearch";
 import { Sheet } from "react-modal-sheet";
 import FullScreenLoader from "../components/FullScreenLoader";
+import { useTouchNavigate } from "../helper/TouchNavigate";
 
 // import n1 from "../assets/n1.png";
 // import n2 from "../assets/n2.png";
@@ -76,9 +77,16 @@ const News = () => {
     const fname = name.split(" ");
     return fname[0];
   };
+
+  const touch = useTouchNavigate({left: () => navigate("/market")})
+  const touchSheet = useTouchNavigate({left : () => {
+    setisOpen(false);
+    setnewsDetails("");
+  }})
+
   return (
     <>
-      <div className="container pt-3 pb-5 mb-8">
+      <div className="container pt-3 pb-5 mb-8" {...touch}>
         <FullScreenLoader
           isLoading={isLoading}
           message="Searching the world for your news "
@@ -253,7 +261,7 @@ const News = () => {
           <Sheet.Header style={{ background: "#000" }} />
           <Sheet.Content style={{ background: "#000" }}>
             <Sheet.Scroller draggableAt="both">
-              {<NewsSearch newsDetails={newsDetails} />}
+              {<NewsSearch touch={touchSheet} newsDetails={newsDetails} />}
             </Sheet.Scroller>
           </Sheet.Content>
         </Sheet.Container>

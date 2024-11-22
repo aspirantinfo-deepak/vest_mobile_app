@@ -131,7 +131,7 @@ const NewsSearch = (props: any) => {
     }
   };
   return (
-    <div className="container" style={{ padding: 24 }}>
+    <div className="container" style={{ padding: 24 }} {...props?.touch}>
       <FullScreenLoader
         isLoading={isLoading}
         message="Searching the world for your news"

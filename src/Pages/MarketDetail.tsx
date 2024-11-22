@@ -14,8 +14,11 @@ import {
   fetchUserCashBalance,
   fetchUserPortfolio,
   formatCurrency as fc,
+  getUnixTimestampRange,
+  portfolioIntervalMap,
 } from "../helper/MarketHelper";
 import CurrencyInput from "../components/CurrencyInput";
+import { useTouchNavigate } from "../helper/TouchNavigate";
 
 const MarketDetail = () => {
   const [userPortfolio, setUserPortfolio] = useState<any>(null);
@@ -200,67 +203,34 @@ const MarketDetail = () => {
   };
   const getStockGraph = async () => {
     try {
-      const timeValues: { [key: string]: any } = {
-        live: {
-          from: (date: Date) =>
-            date.setTime(date.getTime() - 1000 * 60 * 5) && date,
-          multiplier: 1,
-          timespan: "second",
-        },
-        "1h": {
-          from: (date: Date) =>
-            date.setTime(date.getTime() - 1000 * 60 * 60) && date,
-          multiplier: 14,
-          timespan: "second",
-        },
-        "1d": {
-          from: (date: Date) => date.setDate(date.getDate() - 1) && date,
-          multiplier: 1,
-          timespan: "minute",
-        },
-        "1w": {
-          from: (date: Date) => date.setDate(date.getDate() - 7) && date,
-          multiplier: 15,
-          timespan: "minute",
-        },
-        "3m": {
-          from: (date: Date) => date.setMonth(date.getMonth() - 3) && date,
-          multiplier: 1,
-          timespan: "day",
-        },
-        "1y": {
-          from: (date: Date) =>
-            date.setFullYear(date.getFullYear() - 1) && date,
-          multiplier: 1,
-          timespan: "day",
-        },
-        all: {
-          from: () => new Date("August 01, 2003"),
-          multiplier: 1,
-          timespan: "week",
-        },
-      };
-      const currentDate = new Date();
-      const oldDate = timeValues[interval].from(new Date(currentDate));
+      let fromDateUnixMs;
+      let multiplier, timespan;
+      let toDateUnixMs = new Date().getTime();
 
-      // setIsLoading(true);
-      const url =
-        "/api/markets/stock/datapoints?" +
-        "ticker=" +
-        ticker +
-        "&" +
-        "fromDateUnixMs=" +
-        oldDate.getTime() +
-        "&" +
-        "toDateUnixMs=" +
-        currentDate.getTime() +
-        "&" +
-        "multiplier=" +
-        timeValues[interval].multiplier +
-        "&" +
-        "timespan=" +
-        timeValues[interval].timespan;
-      const response = await getRequest<any>(url);
+      if (interval === "all time") {
+        fromDateUnixMs = new Date("2024-08-01").getTime();
+      } else {
+        fromDateUnixMs = getUnixTimestampRange(interval);
+      }
+
+      const intervalArray =
+        portfolioIntervalMap[interval as keyof typeof portfolioIntervalMap];
+
+      multiplier = intervalArray[0];
+      timespan = intervalArray[1];
+      // setsampleData([]);
+      const response: any = await getRequest(
+        "/api/markets/stock/datapoints",
+        {
+          params: {
+            ticker,
+            multiplier,
+            timespan,
+            fromDateUnixMs,
+            toDateUnixMs,
+          },
+        }
+      );
       setIsLoading(false);
       setsampleData([]);
       if (response.status == 200) {
@@ -514,9 +484,20 @@ const MarketDetail = () => {
     }
   };
 
+  const goBack = () => {
+    navigate(-1);
+    setisStockDetails(1);
+    setinterval("1w");
+    setstockDetail("");
+    setsampleData("");
+    setcurrentWatch("");
+  }
+
+  const touch = useTouchNavigate({left: goBack})
+
   return (
     <>
-      <div className="container pt-3 pb-5 mb-5">
+      <div className="container pt-3 pb-5 mb-5" {...touch}>
         <FullScreenLoader isLoading={isLoading} message="Please wait..." />
 
         {isStockDetails == 2 && (
