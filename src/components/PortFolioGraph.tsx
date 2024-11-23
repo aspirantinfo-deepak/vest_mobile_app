@@ -18,7 +18,6 @@ const PortFolioGraph: React.FC<LineChartProps> = ({
   const chartRef = useRef<any>(null);
   useEffect(() => {
     const chart = chartRef.current?.chart;
-    console.log(data);
     const handleTouchStart = (e: any) => {
       console.log("Touch started", e.touches[0]);
     };
@@ -41,7 +40,7 @@ const PortFolioGraph: React.FC<LineChartProps> = ({
           });
         });
         setcurrentPrice(currentPrice);
-      })
+      });
       setTimeout(() => {
         localStorage.removeItem("unsetTouchNavigator");
       }, 2000);
@@ -50,11 +49,34 @@ const PortFolioGraph: React.FC<LineChartProps> = ({
       console.log("Touch move", e);
       localStorage.setItem("unsetTouchNavigator", "1");
     };
-
+    const handleClick = (e: any) => {
+      console.log("Click", e);
+      setTimeout(() => {
+        chart.xAxis[0].removePlotLine();
+        chart.tooltip.hide();
+        chart.yAxis[0].addPlotLine({
+          value: previousPrice,
+          color: "gray",
+          dashStyle: "Dot",
+          width: 1,
+          zIndex: 5,
+        });
+        chart.series.forEach((series: any) => {
+          series.points.forEach((point: any) => {
+            point.setState(""); // Reset marker state
+          });
+        });
+        setcurrentPrice(currentPrice);
+      });
+      setTimeout(() => {
+        localStorage.removeItem("unsetTouchNavigator");
+      }, 2000);
+    };
     if (chart) {
       Highcharts.addEvent(chart.container, "touchstart", handleTouchStart);
       Highcharts.addEvent(chart.container, "touchend", handleTouchEnd);
       Highcharts.addEvent(chart.container, "touchmove", handleTouchMove);
+      Highcharts.addEvent(chart.container, "click", handleClick);
     }
   }, [currentPrice]);
   const [options, setoptions] = useState<any>({});

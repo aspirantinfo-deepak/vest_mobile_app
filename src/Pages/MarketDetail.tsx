@@ -219,18 +219,15 @@ const MarketDetail = () => {
       multiplier = intervalArray[0];
       timespan = intervalArray[1];
       // setsampleData([]);
-      const response: any = await getRequest(
-        "/api/markets/stock/datapoints",
-        {
-          params: {
-            ticker,
-            multiplier,
-            timespan,
-            fromDateUnixMs,
-            toDateUnixMs,
-          },
-        }
-      );
+      const response: any = await getRequest("/api/markets/stock/datapoints", {
+        params: {
+          ticker,
+          multiplier,
+          timespan,
+          fromDateUnixMs,
+          toDateUnixMs,
+        },
+      });
       setIsLoading(false);
       setsampleData([]);
       if (response.status == 200) {
@@ -250,6 +247,19 @@ const MarketDetail = () => {
     } catch (error: any) {
       setIsLoading(false);
       console.error("Error creating user:", error);
+    }
+  };
+  const formatCurrencyWithoutDollar = (num: any) => {
+    if (Math.abs(num) >= 1_000_000_000_000) {
+      return `${(num / 1_000_000_000_000).toFixed(1)}T`; // Trillion
+    } else if (Math.abs(num) >= 1_000_000_000) {
+      return `${(num / 1_000_000_000).toFixed(1)}B`; // Billion
+    } else if (Math.abs(num) >= 1_000_000) {
+      return `${(num / 1_000_000).toFixed(1)}M`; // Million
+    } else if (Math.abs(num) >= 1_000) {
+      return `${(num / 1_000).toFixed(1)}K`; // Thousand
+    } else {
+      return num.toString(); // Less than 1K
     }
   };
   const formatCurrency = (num: any) => {
@@ -491,9 +501,9 @@ const MarketDetail = () => {
     setstockDetail("");
     setsampleData("");
     setcurrentWatch("");
-  }
+  };
 
-  const touch = useTouchNavigate({left: goBack})
+  const touch = useTouchNavigate({ left: goBack });
 
   return (
     <>
@@ -870,7 +880,7 @@ const MarketDetail = () => {
                 <p className="para5">Mkt Cap</p>
                 <p className="para6">
                   {(stockDetail?.market_cap &&
-                    formatCurrency(stockDetail?.market_cap)) ||
+                    formatCurrencyWithoutDollar(stockDetail?.market_cap)) ||
                     "--"}
                 </p>
               </div>

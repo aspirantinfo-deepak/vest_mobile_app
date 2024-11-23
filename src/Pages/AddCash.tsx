@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import CurrencyInput from "../components/CurrencyInput";
 
 const AddCash = () => {
-  const totalCash = localStorage.getItem("totalCash");
+  const totalCash = JSON.parse(localStorage.getItem("totalCash")!);
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [amount, setamount] = useState<any>("");
@@ -79,7 +79,7 @@ const AddCash = () => {
           <div className="col-12 addcashpaghead">
             <h1>Add cash</h1>
             <p className="pt-2">
-              You currently have {formatCurrency(totalCash) || 0} in cash
+              You currently have {formatCurrency(totalCash)} in cash
             </p>
           </div>
           <div className="col-12 py-5">
