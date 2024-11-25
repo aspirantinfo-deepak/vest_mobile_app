@@ -82,13 +82,20 @@ const Markets = () => {
       currency: "USD",
     }).format(value);
   };
-  
-  const touch = useTouchNavigate({left: () => navigate("/portfolio"), right: () => navigate("/news")})
-  const touchSheet = useTouchNavigate({left : () => setOpen(false) })
-  
+
+  const touch = useTouchNavigate({
+    left: () => navigate("/portfolio"),
+    right: () => navigate("/news"),
+  });
+  const touchSheet = useTouchNavigate({ left: () => setOpen(false) });
+
   return (
     <>
-      <div className="container pt-3 pb-5  mb-8 " {...touch}>
+      <div
+        className="container pt-3 pb-5  mb-8 "
+        style={{ height: "100vh" }}
+        {...touch}
+      >
         <FullScreenLoader isLoading={isLoading} message="Please wait..." />
         <div className="row pt-3">
           <div className="col-9 ">
@@ -1178,7 +1185,7 @@ const Markets = () => {
           <Sheet.Header style={{ background: "#000" }} />
           <Sheet.Content style={{ background: "#000" }}>
             <Sheet.Scroller draggableAt="both">
-              <MarketSearch touch={touchSheet}/>
+              <MarketSearch touch={touchSheet} />
             </Sheet.Scroller>
           </Sheet.Content>
         </Sheet.Container>

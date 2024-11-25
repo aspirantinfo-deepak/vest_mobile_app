@@ -17,10 +17,16 @@ const Footer = () => {
       localStorage.setItem("isAPI", JSON.stringify(true));
     }
   }, [isOpen]);
-  const touchSheet = useTouchNavigate({left : () => setOpen(false)})
+  const touchSheet = useTouchNavigate({ left: () => setOpen(false) });
   return (
     <footer>
-      <button className="searchmarketbtn" onClick={() => setOpen(true)}>
+      <button
+        className="searchmarketbtn"
+        onClick={() => {
+          localStorage.setItem("modalOpen", JSON.stringify(true));
+          setOpen(true);
+        }}
+      >
         Search {location.pathname == "/news" && "news"}
         {location.pathname == "/" && "news"}{" "}
         {(location.pathname == "/market" ||
@@ -59,6 +65,7 @@ const Footer = () => {
           className={location.pathname == "/portfolio" ? "active" : ""}
           onClick={() => {
             // props.currentPage(2);
+
             navigate("/portfolio");
           }}
         >
@@ -68,7 +75,10 @@ const Footer = () => {
       </div>
       <Sheet
         isOpen={isOpen}
-        onClose={() => setOpen(false)}
+        onClose={() => {
+          localStorage.removeItem("modalOpen");
+          setOpen(false);
+        }}
         // snapPoints={[1, 0.5, 0.25]}
         initialSnap={0}
         // detent="full-height"
@@ -83,8 +93,12 @@ const Footer = () => {
               {(location.pathname == "/market" ||
                 location.pathname == "/marketdetail" ||
                 location.pathname == "/addcash" ||
-                location.pathname == "/addcashsuccess") && <MarketSearch touch={touchSheet} />}
-              {location.pathname == "/portfolio" && <MarketSearch touch={touchSheet} />}
+                location.pathname == "/addcashsuccess") && (
+                <MarketSearch touch={touchSheet} />
+              )}
+              {location.pathname == "/portfolio" && (
+                <MarketSearch touch={touchSheet} />
+              )}
             </Sheet.Scroller>
           </Sheet.Content>
         </Sheet.Container>

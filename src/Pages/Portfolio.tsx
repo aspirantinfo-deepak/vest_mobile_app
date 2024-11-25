@@ -623,8 +623,8 @@ const Portfolio = () => {
     return { backgroundColor, border };
   };
 
-  const touch = useTouchNavigate({right: () => navigate("/market")})
-  const touchSheet = useTouchNavigate({left : () => setOpen(false) })
+  const touch = useTouchNavigate({ right: () => navigate("/market") });
+  const touchSheet = useTouchNavigate({ left: () => setOpen(false) });
 
   return (
     <>
@@ -1997,7 +1997,7 @@ const Portfolio = () => {
           <Sheet.Header style={{ background: "#000" }} />
           <Sheet.Content style={{ background: "#000" }}>
             <Sheet.Scroller draggableAt="both">
-              <MarketSearch touch={touchSheet}/>
+              <MarketSearch touch={touchSheet} />
             </Sheet.Scroller>
           </Sheet.Content>
         </Sheet.Container>

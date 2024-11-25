@@ -551,7 +551,7 @@ const MarketSearch = (props: any) => {
   };
 
   return (
-    <div className="container" {...props?.touch}>
+    <div className="container" style={{ height: "100vh" }} {...props?.touch}>
       <FullScreenLoader isLoading={isLoading} message="Please wait..." />
       {isStockDetails == 1 && (
         <div>

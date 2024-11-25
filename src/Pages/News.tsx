@@ -78,11 +78,13 @@ const News = () => {
     return fname[0];
   };
 
-  const touch = useTouchNavigate({left: () => navigate("/market")})
-  const touchSheet = useTouchNavigate({left : () => {
-    setisOpen(false);
-    setnewsDetails("");
-  }})
+  const touch = useTouchNavigate({ left: () => navigate("/market") });
+  const touchSheet = useTouchNavigate({
+    left: () => {
+      setisOpen(false);
+      setnewsDetails("");
+    },
+  });
 
   return (
     <>
@@ -203,6 +205,7 @@ const News = () => {
               className="row pt-3 px-3   stock_names_prrice mb-1"
               key={key}
               onClick={() => {
+                localStorage.setItem("modalOpen", JSON.stringify(true));
                 setisOpen(true);
                 setnewsDetails(item);
               }}
@@ -250,6 +253,7 @@ const News = () => {
       <Sheet
         isOpen={isOpen}
         onClose={() => {
+          localStorage.removeItem("modalOpen");
           setisOpen(false);
           setnewsDetails("");
         }}
